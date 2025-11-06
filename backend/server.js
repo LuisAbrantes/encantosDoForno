@@ -1,11 +1,40 @@
-const Sequelize = require("sequelize"); 
+const express = require("express");
+const GET = require("./API/GET");
+const POST = require("./API/POST");
+const DELETE = require("./API/DELETE");
+const chalk = require("chalk");
+const cl = console.log;
+const blue = chalk.blue;
+const red = chalk.red;
+const green = chalk.green;
+const black = chalk.black;
 
-const sequelize = new Sequelize(
-  "postgresql://postgres.gjyakmgtkmmeqqgdxavo:6TSPKZ0qZcJEAQXI@aws-1-sa-east-1.pooler.supabase.com:6543/postgres",
-  {
-    dialect: "postgres",
-    logging: false,
-  }
+(async () => {
+  const database = require("./Data/config");
+
+  //?Tables Requirements
+  const Employees = require("./Data/Tables/Employees");
+  const Line = require("./Data/Tables/Line");
+  const Products = require("./Data/Tables/Products");
+  const Schedules = require("./Data/Tables/Schedules");
+
+  //? Database Sync | SUPABASE⚡
+  await database.sync({ force: false });
+  cl(chalk.bgWhite("\nBanco sincronizado com sucesso ✅ "));
+})();
+
+const app = express();
+
+// //? Preferences
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// //? Uses GET,POST & DELETE Routes
+app.use(GET);
+// app.use(POST);
+// app.use(DELETE);
+
+//? Booting the Server
+app.listen(3000, () =>
+  cl(blue("\nServidor runnning in ") + red("http://localhost:3000"))
 );
-
-module.exports = sequelize;
