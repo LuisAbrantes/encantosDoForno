@@ -1,6 +1,77 @@
 @import 'tailwindcss';
 
-/* Animações customizadas */
+/* ============================================
+   FONTES CUSTOMIZADAS
+   ============================================ */
+
+/* Fonte para corpo de texto - legibilidade */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+        'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+        'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0.01em;
+    line-height: 1.6;
+}
+
+/* Pacifico - Títulos principais e logo */
+.font-pacifico {
+    font-family: 'Pacifico', cursive, 'Dancing Script', serif;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+}
+
+/* Dancing Script - Subtítulos e destaques */
+.font-dancing {
+    font-family: 'Dancing Script', cursive, 'Pacifico', serif;
+    letter-spacing: 0.015em;
+    line-height: 1.4;
+}
+
+/* Great Vibes - Chamadas de ação e menus */
+.font-vibes {
+    font-family: 'Great Vibes', cursive, 'Allura', serif;
+    letter-spacing: 0.03em;
+    line-height: 1.5;
+}
+
+/* Allura - Seções elegantes (depoimentos, bio) */
+.font-allura {
+    font-family: 'Allura', cursive, 'Great Vibes', serif;
+    letter-spacing: 0.025em;
+    line-height: 1.5;
+}
+
+/* Classes auxiliares para melhor legibilidade */
+.text-cursive-lg {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.6;
+}
+
+.text-cursive-xl {
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.5;
+}
+
+.text-cursive-2xl {
+    font-size: 1.5rem; /* 24px */
+    line-height: 1.4;
+}
+
+/* Melhor contraste e legibilidade */
+.text-readable {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.text-readable-dark {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   ANIMAÇÕES CUSTOMIZADAS
+   ============================================ */
+
 @keyframes fade-in {
     from {
         opacity: 0;
@@ -39,22 +110,32 @@
     animation-fill-mode: backwards;
 }
 
+/* ============================================
+   CONFIGURAÇÕES GERAIS
+   ============================================ */
+
 /* Scroll suave */
 html {
     scroll-behavior: smooth;
-}
-
-/* Fonte mais acolhedora */
-body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-        'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-        'Helvetica Neue', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Evitar seleção de texto nos ícones */
 button,
 a {
     -webkit-tap-highlight-color: transparent;
+}
+
+/* Responsividade para fontes cursivas em mobile */
+@media (max-width: 640px) {
+    .font-pacifico,
+    .font-dancing,
+    .font-vibes,
+    .font-allura {
+        letter-spacing: 0.01em;
+    }
+
+    /* Ajuste de tamanho em telas pequenas */
+    .responsive-cursive {
+        font-size: 0.95em;
+    }
 }

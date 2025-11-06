@@ -1,76 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import fogoImage from '../assets/fogo.jpg';
+import HeroSection from '../components/HeroSection';
+import { RESTAURANT_CONFIG, SOCIAL_MEDIA, IMAGES } from '../config/constants';
 
 const LandingPage = () => {
     return (
         <div className="min-h-screen">
-            {/* Hero Section */}
-            <section className="relative h-screen flex items-center justify-center overflow-hidden">
-                {/* Background Image */}
-                <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                        backgroundImage: `url(${fogoImage})`,
-                        filter: 'brightness(0.4)'
-                    }}
-                ></div>
-
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-black opacity-50"></div>
-
-                {/* Content */}
-                <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl">
-                    <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
-                        Bem-vindo ao{' '}
-                        <span className="text-amber-400">
-                            Encantos do Forno
-                        </span>
-                    </h1>
-                    <p className="text-xl md:text-2xl text-amber-100 mb-8 animate-slide-up">
-                        Um espaço acolhedor com comida artesanal de Jacareí
-                    </p>
-                    <p className="text-lg text-amber-50 mb-10 max-w-2xl mx-auto animate-slide-up delay-100">
-                        Saboreie pratos preparados com ingredientes frescos,
-                        muito carinho e a tradição que aquece o coração.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up delay-200">
-                        <Link
-                            to="/cardapio"
-                            className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 hover:scale-105 shadow-2xl"
-                        >
-                            Ver Cardápio 🍽️
-                        </Link>
-                        <Link
-                            to="/agendamento"
-                            className="bg-orange-700 hover:bg-orange-800 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 hover:scale-105 shadow-2xl"
-                        >
-                            Faça sua Reserva 📅
-                        </Link>
-                    </div>
-                </div>
-
-                {/* Scroll Indicator */}
-                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-                    <svg
-                        className="w-6 h-6 text-amber-400"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                    </svg>
-                </div>
-            </section>
+            <HeroSection />
 
             {/* Sobre o Restaurante */}
             <section className="py-20 bg-amber-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl md:text-5xl font-bold text-orange-900 mb-4">
+                        <h2 className="font-dancing text-5xl md:text-6xl text-orange-900 mb-4">
                             Nossa História
                         </h2>
                         <div className="w-24 h-1 bg-amber-600 mx-auto"></div>
@@ -78,21 +20,21 @@ const LandingPage = () => {
 
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div className="space-y-6">
-                            <p className="text-lg text-gray-700 leading-relaxed">
+                            <p className="font-sans text-lg text-gray-700 leading-relaxed">
                                 Localizado no coração de{' '}
                                 <strong>Jacareí</strong>, o Encantos do Forno
                                 nasceu do sonho de criar um espaço onde as
                                 pessoas pudessem se reunir em torno de comida
                                 feita com amor e dedicação.
                             </p>
-                            <p className="text-lg text-gray-700 leading-relaxed">
+                            <p className="font-sans text-lg text-gray-700 leading-relaxed">
                                 Nossos pratos são preparados com{' '}
                                 <strong>ingredientes frescos</strong> e
                                 selecionados, respeitando receitas tradicionais
                                 e trazendo o sabor autêntico que aquece o
                                 coração.
                             </p>
-                            <p className="text-lg text-gray-700 leading-relaxed">
+                            <p className="font-sans text-lg text-gray-700 leading-relaxed">
                                 Aqui, tradição e sabor se encontram para
                                 proporcionar uma experiência gastronômica
                                 inesquecível.
@@ -139,11 +81,11 @@ const LandingPage = () => {
             <section className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl md:text-5xl font-bold text-orange-900 mb-4">
+                        <h2 className="font-dancing text-5xl md:text-6xl text-orange-900 mb-4">
                             Nossa Equipe
                         </h2>
                         <div className="w-24 h-1 bg-amber-600 mx-auto mb-6"></div>
-                        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                        <p className="font-sans text-lg text-gray-600 max-w-2xl mx-auto">
                             Conheça as pessoas apaixonadas que preparam cada
                             prato com carinho e dedicação
                         </p>
@@ -156,13 +98,13 @@ const LandingPage = () => {
                                 <div className="text-8xl">👨‍🍳</div>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-2xl font-bold text-orange-900 mb-2">
+                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
                                     Chef Antonio Silva
                                 </h3>
-                                <p className="text-amber-700 font-semibold mb-3">
+                                <p className="font-sans text-amber-700 font-semibold mb-3">
                                     Chef Executivo
                                 </p>
-                                <p className="text-gray-600">
+                                <p className="font-sans text-gray-600">
                                     Com 20 anos de experiência, Chef Antonio
                                     traz técnicas tradicionais e um toque de
                                     inovação para cada receita.
@@ -176,13 +118,13 @@ const LandingPage = () => {
                                 <div className="text-8xl">👩‍🍳</div>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-2xl font-bold text-orange-900 mb-2">
+                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
                                     Chef Maria Santos
                                 </h3>
-                                <p className="text-amber-700 font-semibold mb-3">
+                                <p className="font-sans text-amber-700 font-semibold mb-3">
                                     Confeiteira
                                 </p>
-                                <p className="text-gray-600">
+                                <p className="font-sans text-gray-600">
                                     Especialista em doces artesanais, Maria cria
                                     sobremesas que são verdadeiras obras de
                                     arte.
@@ -196,7 +138,7 @@ const LandingPage = () => {
                                 <div className="text-8xl">🧑‍💼</div>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-2xl font-bold text-orange-900 mb-2">
+                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
                                     João Oliveira
                                 </h3>
                                 <p className="text-amber-700 font-semibold mb-3">
@@ -217,11 +159,11 @@ const LandingPage = () => {
             <section className="py-20 bg-linear-to-b from-amber-50 to-orange-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl md:text-5xl font-bold text-orange-900 mb-4">
+                        <h2 className="font-dancing text-5xl md:text-6xl text-orange-900 mb-4">
                             Pratos em Destaque
                         </h2>
                         <div className="w-24 h-1 bg-amber-600 mx-auto mb-6"></div>
-                        <p className="text-lg text-gray-700 max-w-2xl mx-auto">
+                        <p className="font-sans text-lg text-gray-700 max-w-2xl mx-auto">
                             Conheça alguns dos nossos pratos mais amados,
                             preparados com ingredientes locais e muito sabor
                         </p>
@@ -234,10 +176,10 @@ const LandingPage = () => {
                                 <div className="text-7xl">🍕</div>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-2xl font-bold text-orange-900 mb-2">
+                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
                                     Pizza Artesanal
                                 </h3>
-                                <p className="text-gray-600 mb-4">
+                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
                                     Massa fermentada por 48h, assada em forno a
                                     lenha com ingredientes frescos e
                                     selecionados.
@@ -259,10 +201,10 @@ const LandingPage = () => {
                                 <div className="text-7xl">🥖</div>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-2xl font-bold text-orange-900 mb-2">
+                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
                                     Pão de Fermentação Natural
                                 </h3>
-                                <p className="text-gray-600 mb-4">
+                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
                                     Pães artesanais feitos com fermentação
                                     lenta, crocantes por fora e macios por
                                     dentro.
@@ -284,10 +226,10 @@ const LandingPage = () => {
                                 <div className="text-7xl">🍰</div>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-2xl font-bold text-orange-900 mb-2">
+                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
                                     Torta da Casa
                                 </h3>
-                                <p className="text-gray-600 mb-4">
+                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
                                     Torta artesanal com recheios variados, feita
                                     diariamente com ingredientes premium.
                                 </p>
@@ -308,10 +250,10 @@ const LandingPage = () => {
                                 <div className="text-7xl">🍝</div>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-2xl font-bold text-orange-900 mb-2">
+                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
                                     Massa Fresca
                                 </h3>
-                                <p className="text-gray-600 mb-4">
+                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
                                     Massas preparadas na casa, com molhos
                                     caseiros e ingredientes da região.
                                 </p>
@@ -332,10 +274,10 @@ const LandingPage = () => {
                                 <div className="text-7xl">🥩</div>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-2xl font-bold text-orange-900 mb-2">
+                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
                                     Carne Assada
                                 </h3>
-                                <p className="text-gray-600 mb-4">
+                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
                                     Carnes nobres preparadas no forno a lenha,
                                     macias e suculentas.
                                 </p>
@@ -356,10 +298,10 @@ const LandingPage = () => {
                                 <div className="text-7xl">☕</div>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-2xl font-bold text-orange-900 mb-2">
+                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
                                     Café Especial
                                 </h3>
-                                <p className="text-gray-600 mb-4">
+                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
                                     Cafés especiais da região, torrados e moídos
                                     na hora para máximo frescor.
                                 </p>
@@ -390,11 +332,11 @@ const LandingPage = () => {
             <section className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl md:text-5xl font-bold text-orange-900 mb-4">
+                        <h2 className="font-dancing text-5xl md:text-6xl text-orange-900 mb-4">
                             O Que Dizem Nossos Clientes
                         </h2>
                         <div className="w-24 h-1 bg-amber-600 mx-auto mb-6"></div>
-                        <p className="text-lg text-gray-600">
+                        <p className="font-sans text-lg text-gray-600">
                             A opinião de quem já experimentou nossos pratos
                         </p>
                     </div>
@@ -413,7 +355,7 @@ const LandingPage = () => {
                                     </svg>
                                 ))}
                             </div>
-                            <p className="text-gray-700 mb-4 italic">
+                            <p className="font-allura text-2xl text-gray-700 mb-4 italic text-readable leading-relaxed">
                                 "A melhor pizza artesanal que já comi em
                                 Jacareí! O ambiente é super acolhedor e o
                                 atendimento impecável. Voltarei com certeza!"
@@ -423,10 +365,10 @@ const LandingPage = () => {
                                     👤
                                 </div>
                                 <div>
-                                    <p className="font-bold text-orange-900">
+                                    <p className="font-sans font-bold text-orange-900">
                                         Ana Paula
                                     </p>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="font-sans text-sm text-gray-500">
                                         Cliente desde 2023
                                     </p>
                                 </div>
@@ -446,7 +388,7 @@ const LandingPage = () => {
                                     </svg>
                                 ))}
                             </div>
-                            <p className="text-gray-700 mb-4 italic">
+                            <p className="font-allura text-2xl text-gray-700 mb-4 italic text-readable leading-relaxed">
                                 "Os pães são incríveis! Você sente que foram
                                 feitos com amor. Virou tradição da família vir
                                 aqui todo domingo."
@@ -479,7 +421,7 @@ const LandingPage = () => {
                                     </svg>
                                 ))}
                             </div>
-                            <p className="text-gray-700 mb-4 italic">
+                            <p className="font-allura text-2xl text-gray-700 mb-4 italic text-readable leading-relaxed">
                                 "Lugar perfeito para um almoço em família.
                                 Comida de qualidade, ambiente agradável e preços
                                 justos. Recomendo muito!"
@@ -505,25 +447,25 @@ const LandingPage = () => {
             {/* Call to Action */}
             <section className="py-20 bg-linear-to-r from-orange-800 to-red-900 text-white">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                    <h2 className="font-dancing text-5xl md:text-6xl mb-6 text-readable-dark">
                         Pronto para uma experiência inesquecível?
                     </h2>
-                    <p className="text-xl mb-8 text-amber-100">
+                    <p className="font-sans text-xl mb-8 text-amber-100 leading-relaxed">
                         Faça sua reserva e venha nos visitar! Estamos ansiosos
                         para receber você.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
                             to="/agendamento"
-                            className="bg-white text-orange-900 hover:bg-amber-100 font-bold py-4 px-10 rounded-lg text-lg transition-all duration-300 hover:scale-105 shadow-2xl"
+                            className="font-vibes text-2xl bg-white text-orange-900 hover:bg-amber-100 py-4 px-10 rounded-lg transition-all duration-300 hover:scale-105 shadow-2xl"
                         >
                             Agendar Visita 📅
                         </Link>
                         <a
-                            href="https://wa.me/5512396100000"
+                            href={SOCIAL_MEDIA.whatsapp}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-10 rounded-lg text-lg transition-all duration-300 hover:scale-105 shadow-2xl"
+                            className="font-vibes text-2xl bg-green-600 hover:bg-green-700 text-white py-4 px-10 rounded-lg transition-all duration-300 hover:scale-105 shadow-2xl"
                         >
                             WhatsApp 💬
                         </a>

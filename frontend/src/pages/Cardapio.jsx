@@ -167,10 +167,10 @@ const Cardapio = () => {
             {/* Header */}
             <section className="bg-linear-to-r from-orange-800 to-red-900 text-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h1 className="text-5xl md:text-6xl font-bold mb-4">
+                    <h1 className="font-pacifico text-6xl md:text-7xl mb-4 text-readable-dark">
                         Nosso Cardápio
                     </h1>
-                    <p className="text-xl text-amber-100">
+                    <p className="font-dancing text-2xl text-amber-100">
                         Descubra os sabores artesanais que preparamos com
                         carinho
                     </p>
@@ -186,7 +186,7 @@ const Cardapio = () => {
                                 <span className="text-5xl mr-4">
                                     {category.icon}
                                 </span>
-                                <h2 className="text-4xl font-bold text-orange-900">
+                                <h2 className="font-dancing text-5xl text-orange-900">
                                     {category.name}
                                 </h2>
                             </div>
@@ -198,14 +198,14 @@ const Cardapio = () => {
                                         className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                                     >
                                         <div className="flex justify-between items-start mb-3">
-                                            <h3 className="text-xl font-bold text-orange-900">
+                                            <h3 className="font-dancing text-2xl text-orange-900">
                                                 {item.name}
                                             </h3>
                                             <span className="text-xl font-bold text-amber-700">
                                                 {item.price}
                                             </span>
                                         </div>
-                                        <p className="text-gray-600">
+                                        <p className="font-sans text-gray-600 leading-relaxed">
                                             {item.description}
                                         </p>
                                     </div>
@@ -219,16 +219,16 @@ const Cardapio = () => {
             {/* Call to Action */}
             <section className="py-16 bg-white">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="text-3xl font-bold text-orange-900 mb-6">
+                    <h2 className="font-dancing text-4xl text-orange-900 mb-6">
                         Gostou do que viu?
                     </h2>
-                    <p className="text-lg text-gray-600 mb-8">
+                    <p className="font-sans text-lg text-gray-600 mb-8">
                         Faça sua reserva ou peça para viagem!
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <a
                             href="/agendamento"
-                            className="bg-orange-700 hover:bg-orange-800 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
+                            className="font-vibes text-2xl bg-orange-700 hover:bg-orange-800 text-white py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
                         >
                             Fazer Reserva 📅
                         </a>
@@ -236,7 +236,7 @@ const Cardapio = () => {
                             href="https://wa.me/5512396100000"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
+                            className="font-vibes text-2xl bg-green-600 hover:bg-green-700 text-white py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
                         >
                             Pedir pelo WhatsApp 💬
                         </a>

@@ -7,14 +7,14 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Informações de Contato */}
                     <div>
-                        <h3 className="text-xl font-bold mb-4 flex items-center space-x-2">
+                        <h3 className="font-dancing text-2xl mb-4 flex items-center space-x-2">
                             <span className="text-2xl">🔥</span>
                             <span>Encantos do Forno</span>
                         </h3>
-                        <p className="text-amber-100 mb-2">
+                        <p className="font-sans text-amber-100 mb-2">
                             Localizado em Jacareí, SP
                         </p>
-                        <div className="space-y-2 text-amber-100">
+                        <div className="space-y-2 font-sans text-amber-100">
                             <p className="flex items-center space-x-2">
                                 <span>📞</span>
                                 <span>(12) 3961-XXXX</span>
@@ -32,7 +32,7 @@ const Footer = () => {
 
                     {/* Redes Sociais */}
                     <div>
-                        <h3 className="text-xl font-bold mb-4">Siga-nos</h3>
+                        <h3 className="font-dancing text-2xl mb-4">Siga-nos</h3>
                         <div className="flex space-x-4">
                             <a
                                 href="https://instagram.com"
@@ -84,7 +84,9 @@ const Footer = () => {
 
                     {/* Localização */}
                     <div>
-                        <h3 className="text-xl font-bold mb-4">Onde Estamos</h3>
+                        <h3 className="font-dancing text-2xl mb-4">
+                            Onde Estamos
+                        </h3>
                         <p className="text-amber-100 mb-4">
                             Rua do Forno Artesanal, 123
                             <br />
