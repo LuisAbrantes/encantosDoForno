@@ -30,10 +30,10 @@ const Agendamento = () => {
             {/* Header */}
             <section className="bg-linear-to-r from-orange-800 to-red-900 text-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h1 className="text-5xl md:text-6xl font-bold mb-4">
+                    <h1 className="font-pacifico text-6xl md:text-7xl mb-4 text-readable-dark">
                         Faça sua Reserva
                     </h1>
-                    <p className="text-xl text-amber-100">
+                    <p className="font-dancing text-2xl text-amber-100">
                         Garanta seu lugar e desfrute de uma experiência
                         inesquecível
                     </p>
@@ -49,7 +49,7 @@ const Agendamento = () => {
                             <div>
                                 <label
                                     htmlFor="nome"
-                                    className="block text-sm font-bold text-orange-900 mb-2"
+                                    className="block font-sans text-sm font-bold text-orange-900 mb-2"
                                 >
                                     Nome Completo *
                                 </label>
@@ -70,7 +70,7 @@ const Agendamento = () => {
                                 <div>
                                     <label
                                         htmlFor="email"
-                                        className="block text-sm font-bold text-orange-900 mb-2"
+                                        className="block font-sans text-sm font-bold text-orange-900 mb-2"
                                     >
                                         Email *
                                     </label>
@@ -88,7 +88,7 @@ const Agendamento = () => {
                                 <div>
                                     <label
                                         htmlFor="telefone"
-                                        className="block text-sm font-bold text-orange-900 mb-2"
+                                        className="block font-sans text-sm font-bold text-orange-900 mb-2"
                                     >
                                         Telefone *
                                     </label>
@@ -110,7 +110,7 @@ const Agendamento = () => {
                                 <div>
                                     <label
                                         htmlFor="data"
-                                        className="block text-sm font-bold text-orange-900 mb-2"
+                                        className="block font-sans text-sm font-bold text-orange-900 mb-2"
                                     >
                                         Data *
                                     </label>
@@ -127,7 +127,7 @@ const Agendamento = () => {
                                 <div>
                                     <label
                                         htmlFor="horario"
-                                        className="block text-sm font-bold text-orange-900 mb-2"
+                                        className="block font-sans text-sm font-bold text-orange-900 mb-2"
                                     >
                                         Horário *
                                     </label>
@@ -161,7 +161,7 @@ const Agendamento = () => {
                             <div>
                                 <label
                                     htmlFor="pessoas"
-                                    className="block text-sm font-bold text-orange-900 mb-2"
+                                    className="block font-sans text-sm font-bold text-orange-900 mb-2"
                                 >
                                     Número de Pessoas *
                                 </label>
@@ -189,7 +189,7 @@ const Agendamento = () => {
                             <div>
                                 <label
                                     htmlFor="observacoes"
-                                    className="block text-sm font-bold text-orange-900 mb-2"
+                                    className="block font-sans text-sm font-bold text-orange-900 mb-2"
                                 >
                                     Observações
                                 </label>

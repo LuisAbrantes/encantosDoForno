@@ -107,10 +107,10 @@ const Fila = () => {
             {/* Header */}
             <section className="bg-linear-to-r from-orange-800 to-red-900 text-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h1 className="text-5xl md:text-6xl font-bold mb-4">
+                    <h1 className="font-pacifico text-6xl md:text-7xl mb-4 text-readable-dark">
                         Fila Virtual
                     </h1>
-                    <p className="text-xl text-amber-100">
+                    <p className="font-dancing text-2xl text-amber-100">
                         Entre na fila e aguarde confortavelmente
                     </p>
                 </div>

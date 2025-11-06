@@ -23,7 +23,7 @@ const Navbar = () => {
                         <div className="text-3xl group-hover:scale-110 transition-transform duration-300">
                             🔥
                         </div>
-                        <span className="text-xl font-bold text-amber-100 group-hover:text-white transition-colors duration-300">
+                        <span className="font-pacifico text-2xl text-amber-100 group-hover:text-white transition-colors duration-300 tracking-wide">
                             Encantos do Forno
                         </span>
                     </Link>
