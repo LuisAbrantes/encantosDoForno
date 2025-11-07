@@ -15,6 +15,10 @@ const Products = database.define("Products", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  Product_Weight: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
   Product_Class: {
     type: DataTypes.ENUM("Prato Feito", "Sobremesa", "ETC", "..."),
     allowNull: false,

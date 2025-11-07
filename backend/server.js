@@ -12,7 +12,7 @@ const black = chalk.black;
 (async () => {
   const database = require("./Data/config");
 
-  //?Tables Requirements
+  //? Tables Requirements
   const Employees = require("./Data/Tables/Employees");
   const Line = require("./Data/Tables/Line");
   const Products = require("./Data/Tables/Products");
@@ -25,14 +25,14 @@ const black = chalk.black;
 
 const app = express();
 
-// //? Preferences
+//? Preferences
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// //? Uses GET,POST & DELETE Routes
+//? Uses GET,POST & DELETE Routes
 app.use(GET);
-// app.use(POST);
-// app.use(DELETE);
+//TODO app.use(POST);
+//TODO app.use(DELETE);
 
 //? Booting the Server
 app.listen(3000, () =>
