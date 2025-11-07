@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import logo from '../assets/logoSemFundo.png';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,9 +21,11 @@ const Navbar = () => {
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
                     <Link to="/" className="flex items-center space-x-2 group">
-                        <div className="text-3xl group-hover:scale-110 transition-transform duration-300">
-                            🔥
-                        </div>
+                        <img
+                            src={logo}
+                            alt="Encantos do Forno Logo"
+                            className="h-8 w-8 group-hover:scale-110 transition-transform duration-300"
+                        />
                         <span className="font-pacifico text-2xl text-amber-100 group-hover:text-white transition-colors duration-300 tracking-wide">
                             Encantos do Forno
                         </span>

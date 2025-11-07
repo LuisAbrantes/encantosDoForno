@@ -5,7 +5,16 @@ export const RESTAURANT_CONFIG = {
     phone: '(12) 3961-XXXX',
     email: 'contato@encantosdoforno.com.br',
     whatsapp: 'https://wa.me/5512396100000',
-    schedule: 'Ter-Dom: 11h - 22h'
+    schedule: {
+        weekdays: {
+            days: 'Quarta à Sexta',
+            hours: '6h30 às 15h'
+        },
+        weekend: {
+            days: 'Sábado e Domingo',
+            hours: '7h às 11h e 19h às 22h'
+        }
+    }
 };
 
 // Image Assets
@@ -17,17 +26,18 @@ export const IMAGES = {
 
 // Social Media Links
 export const SOCIAL_MEDIA = {
-    instagram: 'https://instagram.com',
-    facebook: 'https://facebook.com',
+    instagram: 'https://www.instagram.com/encantosdofornojcr/',
+    facebook:
+        'https://www.facebook.com/people/Encantos-do-Forno/61575225126843/',
     whatsapp: RESTAURANT_CONFIG.whatsapp
 };
 
 // Restaurant Address
 export const ADDRESS = {
-    street: 'Rua do Forno Artesanal, 123',
-    neighborhood: 'Centro',
+    street: 'Avenida Edmundo de Souza, 225',
+    neighborhood: 'Jardim América',
     city: 'Jacareí',
     state: 'SP',
-    zipCode: '12300-000',
-    mapUrl: 'https://www.google.com/maps/search/restaurante+jacarei+sp'
+    zipCode: '12322-050',
+    mapUrl: 'https://www.google.com/maps/search/Avenida+Edmundo+de+Souza+225+Jardim+America+Jacarei+SP+12322050'
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { SOCIAL_MEDIA, ADDRESS, RESTAURANT_CONFIG } from '../config/constants';
 
 const Footer = () => {
     return (
@@ -23,10 +24,41 @@ const Footer = () => {
                                 <span>📧</span>
                                 <span>contato@encantosdoforno.com.br</span>
                             </p>
-                            <p className="flex items-center space-x-2">
-                                <span>⏰</span>
-                                <span>Ter-Dom: 11h - 22h</span>
-                            </p>
+                            <div className="flex items-start space-x-2">
+                                <span className="text-xl">⏰</span>
+                                <div className="space-y-1">
+                                    <div>
+                                        <p className="font-semibold text-amber-50">
+                                            {
+                                                RESTAURANT_CONFIG.schedule
+                                                    .weekdays.days
+                                            }
+                                            :
+                                        </p>
+                                        <p className="text-sm">
+                                            {
+                                                RESTAURANT_CONFIG.schedule
+                                                    .weekdays.hours
+                                            }
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-amber-50">
+                                            {
+                                                RESTAURANT_CONFIG.schedule
+                                                    .weekend.days
+                                            }
+                                            :
+                                        </p>
+                                        <p className="text-sm">
+                                            {
+                                                RESTAURANT_CONFIG.schedule
+                                                    .weekend.hours
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -35,7 +67,7 @@ const Footer = () => {
                         <h3 className="font-dancing text-2xl mb-4">Siga-nos</h3>
                         <div className="flex space-x-4">
                             <a
-                                href="https://instagram.com"
+                                href={SOCIAL_MEDIA.instagram}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="bg-linear-to-br from-purple-600 to-pink-500 p-3 rounded-lg hover:scale-110 transition-transform duration-300 shadow-lg"
@@ -50,7 +82,7 @@ const Footer = () => {
                                 </svg>
                             </a>
                             <a
-                                href="https://wa.me/5512396100000"
+                                href={SOCIAL_MEDIA.whatsapp}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="bg-green-500 p-3 rounded-lg hover:scale-110 transition-transform duration-300 shadow-lg"
@@ -65,7 +97,7 @@ const Footer = () => {
                                 </svg>
                             </a>
                             <a
-                                href="https://facebook.com"
+                                href={SOCIAL_MEDIA.facebook}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="bg-blue-600 p-3 rounded-lg hover:scale-110 transition-transform duration-300 shadow-lg"
@@ -88,14 +120,15 @@ const Footer = () => {
                             Onde Estamos
                         </h3>
                         <p className="text-amber-100 mb-4">
-                            Rua do Forno Artesanal, 123
+                            {ADDRESS.street}
                             <br />
-                            Centro - Jacareí/SP
+                            {ADDRESS.neighborhood} - {ADDRESS.city}/
+                            {ADDRESS.state}
                             <br />
-                            CEP: 12300-000
+                            CEP: {ADDRESS.zipCode}
                         </p>
                         <a
-                            href="https://www.google.com/maps/search/restaurante+jacarei+sp"
+                            href={ADDRESS.mapUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center space-x-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
