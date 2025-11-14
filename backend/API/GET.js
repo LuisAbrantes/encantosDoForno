@@ -9,74 +9,83 @@ const Products = require("../Data/Tables/Products");
 const Schedules = require("../Data/Tables/Schedules");
 
 const HTMLERRORMAKER = (add) => {
-  const ERRORhtml = `
-        <!DOCTYPE html>
-        <html lang="pt-br">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Div Centralizada</title>
-            
-            <style>
-                /* Estes estilos no <body> são para centralizar a div 
-                na página (Requisito 4) 
-                */
-                body {
-                    display: flex;
-                    justify-content: center; /* Centraliza horizontalmente */
-                    align-items: center;   /* Centraliza verticalmente */
-                    min-height: 100vh;     /* Altura total da tela */
-                    margin: 0;             /* Remove margens padrão */
-                    background-color: #222222ff; /* Um fundo leve para a página */
-                    font-family: sans-serif;
-                }
-
-                /* Estes são os estilos da sua div 
-                */
-                .minha-div {
-                    /* 1. Fundo cinza */
-                    background-color: #ffffffff;
-                    
-                    /* 2. Borda de cima vermelha */
-                    border-top: 8px solid #8a0f0fff;
-                    
-                    /* 3. Bordas redondas */
-                    border-radius: 10px;
-                    
-                    /* 6. Adaptar ao conteúdo (e espaçamento interno) */
-                    width: fit-content; /* A largura se ajusta ao texto */
-                    padding: 25px;      /* Espaço entre o texto e as bordas */
-                    
-                    /* Segurança: Define uma largura máxima */
-                    max-width: 90%; 
-                }
-            </style>
-        </head>
-            <body>
-            <div class="minha-div">
-            ${add}            
-            </div>
-
-            </body>
-        </html>
-        `;
+  const ERRORhtml = `<!DOCTYPE html><html lang="pt-br"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Div Centralizada</title><style>body {display: flex;justify-content: center; /* Centraliza horizontalmente */align-items: center;   /* Centraliza verticalmente */min-height: 100vh;     /* Altura total da tela */margin: 0;             /* Remove margens padrão */background-color: #222222ff; /* Um fundo leve para a página */font-family: sans-serif;}.minha-div {background-color: #ffffffff;border-top: 8px solid #8a0f0fff;border-radius: 10px;width: fit-content;padding: 25px;max-width: 90%; }</style></head><body><div class="minha-div">${add}</div></body></html>`;
   return ERRORhtml;
 };
 //? API
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   try {
+    // const allProducts = await Products.findAll();
+    // ${JSON.stringify(
+    //       allProducts
+    //     )}
     res.send(`
+      Produtos
         <form method="POST" action="http://localhost:3000/api/post/products">
             <input type="text" name="Product_Name" placeholder="Nome do Produto"><br>
             <input type="text" name="Product_Price" placeholder="Preço do Produto"><br>
-            <input type="text" name="Product_Weight" placeholder="Peso do Produto">
-            <p>Tipo do Produto</p>
+            <input type="text" name="Product_Weight" placeholder="Peso do Produto"><br>
             <select name="Product_Class">
                 <option value="Sobremesa">Sobremesa</option>
                 <option value="ETC">ETC</option>
-            </select><br>
+            </select><br><br>
             <button type="submit">Enviar</button>
         </form>
+        <button onClick="SeeProducts()">Ver Todos os Produtos</button>
+        <div id="products" style="display:none"></div>
+      <hr>
+      Agendamentos
+        <form method="POST" action="http://localhost:3000/api/post/products">
+            <input type="date" name="Date" placeholder="Nome do Produto"><br>
+            <button type="submit">Enviar</button>
+        </form>
+        <button onClick="SeeSchedules()">Ver Todos os Agendamentos</button>
+        <div id="schedules" style="display:none">TESTE</div>
+      <hr>
+      Fila
+        <form method="POST" action="http://localhost:3000/api/post/products">
+            <select name="Product_Class">
+                <option value="Sobremesa">Sobremesa</option>
+                <option value="ETC">ETC</option>
+            </select><br><br>
+            <button type="submit">Enviar</button>
+        </form>
+        <button onClick="SeeProducts()">Ver Todos os Produtos</button>
+        <div id="line" style="display:none"></div>
+        <hr>
+      Empregados
+        <form method="POST" action="http://localhost:3000/api/post/products">
+            <input type="text" name="Employed_Email" placeholder="Nome do Empregado"><br>
+            <input type="text" name="Employed_Passwprd" placeholder="Senha do Empregado"><br>
+            <button type="submit">Enviar</button>
+        </form>
+        <button onClick="SeeEmployeds()">Ver Todos os Agendamentos</button>
+        <div id="employeds" style="display:none">TESTE</div>
+        <br>
+        
+        <script>
+          let cp = 1
+          const SeeProducts = ()=>{
+            const div = document.getElementById("products")
+            if(cp%2==0){
+              div.style.display = "flex";
+            }else{
+              div.style.display = "none";
+            }
+            cp++
+            }
+          
+          let cs = 1
+          const SeeSchedules = ()=>{
+            const div = document.getElementById("schedules")
+            if(cs%2==0){
+              div.style.display = "flex";
+            }else{
+              div.style.display = "none";
+            }
+            cs++
+            }
+        </script>
         `);
   } catch (ERR) {
     console.error(ERR);
