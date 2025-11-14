@@ -31,7 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //? Uses GET,POST & DELETE Routes
 app.use(GET);
-//TODO app.use(POST);
+app.use(POST);
 //TODO app.use(DELETE);
 
 //? Booting the Server
