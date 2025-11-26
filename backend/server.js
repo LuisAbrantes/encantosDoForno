@@ -2,6 +2,7 @@ const express = require("express");
 const GET = require("./API/GET");
 const POST = require("./API/POST");
 const DELETE = require("./API/DELETE");
+const EDIT = require("./API/EDIT");
 const chalk = require("chalk");
 const cl = console.log;
 const blue = chalk.blue;
@@ -14,7 +15,6 @@ const black = chalk.black;
 
   //? Tables Requirements
   const Employees = require("./Data/Tables/Employees");
-  const Line = require("./Data/Tables/Line");
   const Products = require("./Data/Tables/Products");
   const Schedules = require("./Data/Tables/Schedules");
 
@@ -32,7 +32,8 @@ app.use(express.urlencoded({ extended: true }));
 //? Uses GET,POST & DELETE Routes
 app.use(GET);
 app.use(POST);
-//TODO app.use(DELETE);
+app.use(DELETE);
+app.use(EDIT);
 
 //? Booting the Server
 app.listen(3000, () =>

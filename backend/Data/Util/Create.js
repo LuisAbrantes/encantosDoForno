@@ -6,7 +6,7 @@ const CreateProduct = async (table, dataJson) => {
       Product_Name: dataJson.Product_Name,
       Product_Price: dataJson.Product_Price,
       Product_Weight: dataJson.Product_Weight,
-      Product_Class: dataJson.Product_Class,
+      productClassId: Number(dataJson.Product_Class),
     });
     return newData;
   } catch (ERR) {
@@ -20,10 +20,9 @@ const CreateSchedule = async (table, dataJson) => {
   try {
     console.error(dataJson);
     const newData = await table.create({
-      Product_Name: dataJson.Product_Name,
-      Product_Price: dataJson.Product_Price,
-      Product_Weight: dataJson.Product_Weight,
-      Product_Class: dataJson.Product_Class,
+      Date: dataJson.Date,
+      HM_Peoples: dataJson.Peoples,
+      Number_to_Contact: dataJson.Number,
     });
     return newData;
   } catch (ERR) {
@@ -32,15 +31,12 @@ const CreateSchedule = async (table, dataJson) => {
   }
 };
 
-//? CREATE LINE
-const CreateLine = async (table, dataJson) => {
+//? CREATE SCHEDULE
+const CreateProductClass = async (table, dataJson) => {
   try {
     console.error(dataJson);
     const newData = await table.create({
-      Product_Name: dataJson.Product_Name,
-      Product_Price: dataJson.Product_Price,
-      Product_Weight: dataJson.Product_Weight,
-      Product_Class: dataJson.Product_Class,
+      Name: dataJson.Name,
     });
     return newData;
   } catch (ERR) {
@@ -54,10 +50,9 @@ const CreateEmployed = async (table, dataJson) => {
   try {
     console.error(dataJson);
     const newData = await table.create({
-      Product_Name: dataJson.Product_Name,
-      Product_Price: dataJson.Product_Price,
-      Product_Weight: dataJson.Product_Weight,
-      Product_Class: dataJson.Product_Class,
+      Employed_Name: dataJson.Employed_Name,
+      Employed_Email: dataJson.Employed_Email,
+      Employed_Password: dataJson.Employed_Password,
     });
     return newData;
   } catch (ERR) {
@@ -66,4 +61,9 @@ const CreateEmployed = async (table, dataJson) => {
   }
 };
 
-module.exports = { CreateProduct, CreateEmployed, CreateLine, CreateSchedule };
+module.exports = {
+  CreateProduct,
+  CreateEmployed,
+  CreateSchedule,
+  CreateProductClass,
+};

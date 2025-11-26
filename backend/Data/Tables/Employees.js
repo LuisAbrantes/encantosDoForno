@@ -7,6 +7,10 @@ const Employees = database.define("Employees", {
     autoIncrement: true,
     allowNull: false,
   },
+  Employed_Name: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
   Employed_Email: {
     type: DataTypes.TEXT,
     allowNull: false,

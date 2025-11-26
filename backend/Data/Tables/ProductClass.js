@@ -1,20 +1,19 @@
+// models/ProductClasses.js
 const { DataTypes } = require("sequelize");
 const database = require("../config");
-const Line = database.define("Line", {
+
+const ProductClasses = database.define("ProductClasses", {
   id: {
     primaryKey: true,
     type: DataTypes.INTEGER,
     autoIncrement: true,
     allowNull: false,
   },
-  Position: {
-    type: DataTypes.INTEGER,
+  Name: {
+    type: DataTypes.STRING,
     allowNull: false,
-  },
-  Peoples: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
+    unique: true,
   },
 });
 
-module.exports = Line;
+module.exports = ProductClasses;

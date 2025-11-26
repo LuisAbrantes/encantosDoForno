@@ -11,6 +11,14 @@ const Schedules = database.define("Schedules", {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  Number_to_Contact: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+  HM_Peoples: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
 });
 
 module.exports = Schedules;
