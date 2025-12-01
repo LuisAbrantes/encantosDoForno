@@ -8,7 +8,8 @@ const {
     productRoutes,
     scheduleRoutes,
     employeeRoutes,
-    productClassRoutes
+    productClassRoutes,
+    authRoutes
 } = require('./routes');
 
 // Importação das rotas legadas (para manter compatibilidade)
@@ -58,6 +59,9 @@ const configureMiddlewares = () => {
  * Configuração das rotas
  */
 const configureRoutes = () => {
+    // Rotas de autenticação (públicas)
+    app.use(authRoutes);
+
     // Novas rotas (Clean Code)
     app.use(productRoutes);
     app.use(scheduleRoutes);
