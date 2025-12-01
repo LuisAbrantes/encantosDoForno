@@ -75,32 +75,6 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const register = async (name, email, password) => {
-        try {
-            const response = await fetch(`${API_URL}/api/auth/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name, email, password, role: 'admin' })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Erro ao cadastrar');
-            }
-
-            localStorage.setItem('token', data.data.token);
-            setToken(data.data.token);
-            setUser(data.data.user);
-
-            return { success: true };
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    };
-
     const logout = () => {
         localStorage.removeItem('token');
         setToken(null);
@@ -113,7 +87,6 @@ export const AuthProvider = ({ children }) => {
         loading,
         isAuthenticated: !!token && !!user,
         login,
-        register,
         logout
     };
 

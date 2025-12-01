@@ -6,11 +6,15 @@ const AdminLayout = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
+    // Menu items - Funcionários só aparece para admins
     const menuItems = [
         { path: '/admin', label: 'Dashboard', icon: '📊', end: true },
         { path: '/admin/products', label: 'Produtos', icon: '🍕' },
         { path: '/admin/classes', label: 'Categorias', icon: '📁' },
-        { path: '/admin/schedules', label: 'Agendamentos', icon: '📅' }
+        { path: '/admin/schedules', label: 'Agendamentos', icon: '📅' },
+        ...(user?.role === 'admin'
+            ? [{ path: '/admin/employees', label: 'Funcionários', icon: '👥' }]
+            : [])
     ];
 
     const handleLogout = () => {

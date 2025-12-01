@@ -14,6 +14,7 @@ import Dashboard from './pages/admin/Dashboard';
 import ProductsAdmin from './pages/admin/ProductsAdmin';
 import ClassesAdmin from './pages/admin/ClassesAdmin';
 import SchedulesAdmin from './pages/admin/SchedulesAdmin';
+import EmployeesAdmin from './pages/admin/EmployeesAdmin';
 import Login from './pages/admin/Login';
 import './App.css';
 
@@ -38,6 +39,7 @@ function App() {
                         <Route path="products" element={<ProductsAdmin />} />
                         <Route path="classes" element={<ClassesAdmin />} />
                         <Route path="schedules" element={<SchedulesAdmin />} />
+                        <Route path="employees" element={<EmployeesAdmin />} />
                     </Route>
 
                     {/* Public Routes - with Navbar/Footer */}

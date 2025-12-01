@@ -1,27 +1,85 @@
 const express = require('express');
 const router = express.Router();
 const Employees = require('../Data/Tables/Employees');
-const { generateToken, authenticate } = require('../middleware/auth');
+const {
+    generateToken,
+    authenticate,
+    requireAdmin
+} = require('../middleware/auth');
 const response = require('../utils/responseHandler');
+
+// ============================================================
+// CONSTANTES DE VALIDAÇÃO
+// ============================================================
+const VALIDATION = {
+    PASSWORD_MIN_LENGTH: 6,
+    MESSAGES: {
+        INVALID_CREDENTIALS: 'Credenciais inválidas',
+        EMAIL_PASSWORD_REQUIRED: 'Email e senha são obrigatórios',
+        ALL_FIELDS_REQUIRED: 'Nome, email e senha são obrigatórios',
+        EMAIL_EXISTS: 'Este email já está cadastrado',
+        USER_NOT_FOUND: 'Usuário não encontrado',
+        CURRENT_PASSWORD_REQUIRED: 'Senha atual e nova senha são obrigatórias',
+        WRONG_PASSWORD: 'Senha atual incorreta',
+        LOGIN_SUCCESS: 'Login realizado com sucesso',
+        REGISTER_SUCCESS: 'Funcionário cadastrado com sucesso',
+        PASSWORD_CHANGED: 'Senha alterada com sucesso'
+    }
+};
+
+// ============================================================
+// FUNÇÕES AUXILIARES (HELPERS)
+// ============================================================
+
+/**
+ * Formata os dados do funcionário para resposta da API
+ * @param {Object} employee - Objeto do funcionário do banco
+ * @returns {Object} Dados formatados do usuário
+ */
+const formatUserResponse = employee => ({
+    id: employee.id,
+    name: employee.Employed_Name,
+    email: employee.Employed_Email,
+    role: employee.Role
+});
+
+/**
+ * Gera resposta de autenticação com token e dados do usuário
+ * @param {Object} employee - Objeto do funcionário
+ * @returns {Object} Token e dados do usuário
+ */
+const createAuthResponse = employee => {
+    const user = formatUserResponse(employee);
+    const token = generateToken({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role
+    });
+    return { token, user };
+};
+
+// ============================================================
+// ROTAS PÚBLICAS
+// ============================================================
 
 /**
  * @route   POST /api/auth/login
  * @desc    Autentica um funcionário e retorna um token JWT
+ * @access  Public
  */
 router.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validação básica
         if (!email || !password) {
             return response.error(
                 res,
-                { message: 'Email e senha são obrigatórios' },
+                { message: VALIDATION.MESSAGES.EMAIL_PASSWORD_REQUIRED },
                 400
             );
         }
 
-        // Busca o funcionário pelo email
         const employee = await Employees.findOne({
             where: { Employed_Email: email.toLowerCase().trim() }
         });
@@ -29,42 +87,26 @@ router.post('/api/auth/login', async (req, res) => {
         if (!employee) {
             return response.error(
                 res,
-                { message: 'Credenciais inválidas' },
+                { message: VALIDATION.MESSAGES.INVALID_CREDENTIALS },
                 401
             );
         }
 
-        // Verifica a senha
         const isValidPassword = await employee.validatePassword(password);
 
         if (!isValidPassword) {
             return response.error(
                 res,
-                { message: 'Credenciais inválidas' },
+                { message: VALIDATION.MESSAGES.INVALID_CREDENTIALS },
                 401
             );
         }
 
-        // Gera o token JWT
-        const token = generateToken({
-            id: employee.id,
-            email: employee.Employed_Email,
-            name: employee.Employed_Name,
-            role: employee.Role
-        });
-
+        const authData = createAuthResponse(employee);
         return response.success(
             res,
-            {
-                token,
-                user: {
-                    id: employee.id,
-                    name: employee.Employed_Name,
-                    email: employee.Employed_Email,
-                    role: employee.Role
-                }
-            },
-            'Login realizado com sucesso'
+            authData,
+            VALIDATION.MESSAGES.LOGIN_SUCCESS
         );
     } catch (error) {
         console.error('Erro no login:', error);
@@ -72,74 +114,147 @@ router.post('/api/auth/login', async (req, res) => {
     }
 });
 
+// ============================================================
+// ROTAS PROTEGIDAS - APENAS ADMIN
+// ============================================================
+
 /**
  * @route   POST /api/auth/register
- * @desc    Registra um novo funcionário (apenas para setup inicial ou admin)
+ * @desc    Registra um novo funcionário (apenas admins autenticados)
+ * @access  Private/Admin
  */
-router.post('/api/auth/register', async (req, res) => {
+router.post(
+    '/api/auth/register',
+    authenticate,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const { name, email, password, role } = req.body;
+
+            if (!name || !email || !password) {
+                return response.error(
+                    res,
+                    { message: VALIDATION.MESSAGES.ALL_FIELDS_REQUIRED },
+                    400
+                );
+            }
+
+            const existingEmployee = await Employees.findOne({
+                where: { Employed_Email: email.toLowerCase().trim() }
+            });
+
+            if (existingEmployee) {
+                return response.error(
+                    res,
+                    { message: VALIDATION.MESSAGES.EMAIL_EXISTS },
+                    409
+                );
+            }
+
+            const employee = await Employees.create({
+                Employed_Name: name.trim(),
+                Employed_Email: email.toLowerCase().trim(),
+                Employed_Password: password,
+                Role: role || 'employee'
+            });
+
+            return response.created(
+                res,
+                { user: formatUserResponse(employee) },
+                VALIDATION.MESSAGES.REGISTER_SUCCESS
+            );
+        } catch (error) {
+            console.error('Erro no registro:', error);
+            return response.error(res, error);
+        }
+    }
+);
+
+/**
+ * @route   GET /api/employees
+ * @desc    Lista todos os funcionários (apenas admins)
+ * @access  Private/Admin
+ */
+router.get('/api/employees', authenticate, requireAdmin, async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
-
-        // Validação básica
-        if (!name || !email || !password) {
-            return response.error(
-                res,
-                { message: 'Nome, email e senha são obrigatórios' },
-                400
-            );
-        }
-
-        // Verifica se o email já está em uso
-        const existingEmployee = await Employees.findOne({
-            where: { Employed_Email: email.toLowerCase().trim() }
+        const employees = await Employees.findAll({
+            attributes: [
+                'id',
+                'Employed_Name',
+                'Employed_Email',
+                'Role',
+                'createdAt'
+            ],
+            order: [['createdAt', 'DESC']]
         });
 
-        if (existingEmployee) {
-            return response.error(
-                res,
-                { message: 'Este email já está cadastrado' },
-                409
-            );
-        }
+        const formattedEmployees = employees.map(emp => ({
+            id: emp.id,
+            name: emp.Employed_Name,
+            email: emp.Employed_Email,
+            role: emp.Role,
+            createdAt: emp.createdAt
+        }));
 
-        // Cria o funcionário (a senha é hasheada automaticamente pelo hook)
-        const employee = await Employees.create({
-            Employed_Name: name.trim(),
-            Employed_Email: email.toLowerCase().trim(),
-            Employed_Password: password,
-            Role: role || 'employee'
-        });
-
-        // Gera o token JWT
-        const token = generateToken({
-            id: employee.id,
-            email: employee.Employed_Email,
-            name: employee.Employed_Name,
-            role: employee.Role
-        });
-
-        return response.created(
-            res,
-            {
-                token,
-                user: {
-                    id: employee.id,
-                    name: employee.Employed_Name,
-                    email: employee.Employed_Email,
-                    role: employee.Role
-                }
-            },
-            'Funcionário cadastrado com sucesso'
-        );
+        return response.success(res, formattedEmployees);
     } catch (error) {
-        console.error('Erro no registro:', error);
+        console.error('Erro ao listar funcionários:', error);
         return response.error(res, error);
     }
 });
 
 /**
+ * @route   DELETE /api/employees/:id
+ * @desc    Remove um funcionário (apenas admins, não pode remover a si mesmo)
+ * @access  Private/Admin
+ */
+router.delete(
+    '/api/employees/:id',
+    authenticate,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            // Impede que o admin delete a si mesmo
+            if (parseInt(id) === req.user.id) {
+                return response.error(
+                    res,
+                    { message: 'Você não pode remover sua própria conta' },
+                    400
+                );
+            }
+
+            const employee = await Employees.findByPk(id);
+
+            if (!employee) {
+                return response.notFound(
+                    res,
+                    VALIDATION.MESSAGES.USER_NOT_FOUND
+                );
+            }
+
+            await employee.destroy();
+            return response.success(
+                res,
+                null,
+                'Funcionário removido com sucesso'
+            );
+        } catch (error) {
+            console.error('Erro ao remover funcionário:', error);
+            return response.error(res, error);
+        }
+    }
+);
+
+// ============================================================
+// ROTAS PROTEGIDAS - USUÁRIO AUTENTICADO
+// ============================================================
+
+/**
  * @route   GET /api/auth/me
  * @desc    Retorna os dados do usuário autenticado
+ * @access  Private
  */
 router.get('/api/auth/me', authenticate, async (req, res) => {
     try {
@@ -148,15 +263,10 @@ router.get('/api/auth/me', authenticate, async (req, res) => {
         });
 
         if (!employee) {
-            return response.notFound(res, 'Usuário não encontrado');
+            return response.notFound(res, VALIDATION.MESSAGES.USER_NOT_FOUND);
         }
 
-        return response.success(res, {
-            id: employee.id,
-            name: employee.Employed_Name,
-            email: employee.Employed_Email,
-            role: employee.Role
-        });
+        return response.success(res, formatUserResponse(employee));
     } catch (error) {
         return response.error(res, error);
     }
@@ -165,6 +275,7 @@ router.get('/api/auth/me', authenticate, async (req, res) => {
 /**
  * @route   POST /api/auth/change-password
  * @desc    Altera a senha do usuário autenticado
+ * @access  Private
  */
 router.post('/api/auth/change-password', authenticate, async (req, res) => {
     try {
@@ -173,7 +284,7 @@ router.post('/api/auth/change-password', authenticate, async (req, res) => {
         if (!currentPassword || !newPassword) {
             return response.error(
                 res,
-                { message: 'Senha atual e nova senha são obrigatórias' },
+                { message: VALIDATION.MESSAGES.CURRENT_PASSWORD_REQUIRED },
                 400
             );
         }
@@ -181,10 +292,9 @@ router.post('/api/auth/change-password', authenticate, async (req, res) => {
         const employee = await Employees.findByPk(req.user.id);
 
         if (!employee) {
-            return response.notFound(res, 'Usuário não encontrado');
+            return response.notFound(res, VALIDATION.MESSAGES.USER_NOT_FOUND);
         }
 
-        // Verifica a senha atual
         const isValidPassword = await employee.validatePassword(
             currentPassword
         );
@@ -192,16 +302,19 @@ router.post('/api/auth/change-password', authenticate, async (req, res) => {
         if (!isValidPassword) {
             return response.error(
                 res,
-                { message: 'Senha atual incorreta' },
+                { message: VALIDATION.MESSAGES.WRONG_PASSWORD },
                 401
             );
         }
 
-        // Atualiza a senha (será hasheada pelo hook beforeUpdate)
         employee.Employed_Password = newPassword;
         await employee.save();
 
-        return response.success(res, null, 'Senha alterada com sucesso');
+        return response.success(
+            res,
+            null,
+            VALIDATION.MESSAGES.PASSWORD_CHANGED
+        );
     } catch (error) {
         return response.error(res, error);
     }
