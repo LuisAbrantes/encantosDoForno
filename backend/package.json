@@ -1,12 +1,13 @@
 {
-  "dependencies": {
-    "chalk": "^4.1.2",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "pg": "^8.16.3",
-    "sequelize": "^6.37.7"
-  },
-  "scripts": {
-    "backend": "node --watch server.js"
-  }
+    "dependencies": {
+        "chalk": "^4.1.2",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.3",
+        "express": "^5.1.0",
+        "pg": "^8.16.3",
+        "sequelize": "^6.37.7"
+    },
+    "scripts": {
+        "backend": "node --watch server.js"
+    }
 }
