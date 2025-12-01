@@ -48,7 +48,10 @@ function App() {
                                 <Navbar />
                                 <main className="grow">
                                     <Routes>
-                                        <Route path="/" element={<LandingPage />} />
+                                        <Route
+                                            path="/"
+                                            element={<LandingPage />}
+                                        />
                                         <Route
                                             path="/cardapio"
                                             element={<Cardapio />}
@@ -57,7 +60,10 @@ function App() {
                                             path="/agendamento"
                                             element={<Agendamento />}
                                         />
-                                        <Route path="/fila" element={<Fila />} />
+                                        <Route
+                                            path="/fila"
+                                            element={<Fila />}
+                                        />
                                     </Routes>
                                 </main>
                                 <Footer />

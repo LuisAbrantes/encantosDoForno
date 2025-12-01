@@ -14,7 +14,11 @@ router.post('/api/auth/login', async (req, res) => {
 
         // Validação básica
         if (!email || !password) {
-            return response.error(res, { message: 'Email e senha são obrigatórios' }, 400);
+            return response.error(
+                res,
+                { message: 'Email e senha são obrigatórios' },
+                400
+            );
         }
 
         // Busca o funcionário pelo email
@@ -23,14 +27,22 @@ router.post('/api/auth/login', async (req, res) => {
         });
 
         if (!employee) {
-            return response.error(res, { message: 'Credenciais inválidas' }, 401);
+            return response.error(
+                res,
+                { message: 'Credenciais inválidas' },
+                401
+            );
         }
 
         // Verifica a senha
         const isValidPassword = await employee.validatePassword(password);
 
         if (!isValidPassword) {
-            return response.error(res, { message: 'Credenciais inválidas' }, 401);
+            return response.error(
+                res,
+                { message: 'Credenciais inválidas' },
+                401
+            );
         }
 
         // Gera o token JWT
@@ -41,16 +53,19 @@ router.post('/api/auth/login', async (req, res) => {
             role: employee.Role
         });
 
-        return response.success(res, {
-            token,
-            user: {
-                id: employee.id,
-                name: employee.Employed_Name,
-                email: employee.Employed_Email,
-                role: employee.Role
-            }
-        }, 'Login realizado com sucesso');
-
+        return response.success(
+            res,
+            {
+                token,
+                user: {
+                    id: employee.id,
+                    name: employee.Employed_Name,
+                    email: employee.Employed_Email,
+                    role: employee.Role
+                }
+            },
+            'Login realizado com sucesso'
+        );
     } catch (error) {
         console.error('Erro no login:', error);
         return response.error(res, error);
@@ -67,7 +82,11 @@ router.post('/api/auth/register', async (req, res) => {
 
         // Validação básica
         if (!name || !email || !password) {
-            return response.error(res, { message: 'Nome, email e senha são obrigatórios' }, 400);
+            return response.error(
+                res,
+                { message: 'Nome, email e senha são obrigatórios' },
+                400
+            );
         }
 
         // Verifica se o email já está em uso
@@ -76,7 +95,11 @@ router.post('/api/auth/register', async (req, res) => {
         });
 
         if (existingEmployee) {
-            return response.error(res, { message: 'Este email já está cadastrado' }, 409);
+            return response.error(
+                res,
+                { message: 'Este email já está cadastrado' },
+                409
+            );
         }
 
         // Cria o funcionário (a senha é hasheada automaticamente pelo hook)
@@ -95,16 +118,19 @@ router.post('/api/auth/register', async (req, res) => {
             role: employee.Role
         });
 
-        return response.created(res, {
-            token,
-            user: {
-                id: employee.id,
-                name: employee.Employed_Name,
-                email: employee.Employed_Email,
-                role: employee.Role
-            }
-        }, 'Funcionário cadastrado com sucesso');
-
+        return response.created(
+            res,
+            {
+                token,
+                user: {
+                    id: employee.id,
+                    name: employee.Employed_Name,
+                    email: employee.Employed_Email,
+                    role: employee.Role
+                }
+            },
+            'Funcionário cadastrado com sucesso'
+        );
     } catch (error) {
         console.error('Erro no registro:', error);
         return response.error(res, error);
@@ -131,7 +157,6 @@ router.get('/api/auth/me', authenticate, async (req, res) => {
             email: employee.Employed_Email,
             role: employee.Role
         });
-
     } catch (error) {
         return response.error(res, error);
     }
@@ -146,7 +171,11 @@ router.post('/api/auth/change-password', authenticate, async (req, res) => {
         const { currentPassword, newPassword } = req.body;
 
         if (!currentPassword || !newPassword) {
-            return response.error(res, { message: 'Senha atual e nova senha são obrigatórias' }, 400);
+            return response.error(
+                res,
+                { message: 'Senha atual e nova senha são obrigatórias' },
+                400
+            );
         }
 
         const employee = await Employees.findByPk(req.user.id);
@@ -156,10 +185,16 @@ router.post('/api/auth/change-password', authenticate, async (req, res) => {
         }
 
         // Verifica a senha atual
-        const isValidPassword = await employee.validatePassword(currentPassword);
+        const isValidPassword = await employee.validatePassword(
+            currentPassword
+        );
 
         if (!isValidPassword) {
-            return response.error(res, { message: 'Senha atual incorreta' }, 401);
+            return response.error(
+                res,
+                { message: 'Senha atual incorreta' },
+                401
+            );
         }
 
         // Atualiza a senha (será hasheada pelo hook beforeUpdate)
@@ -167,7 +202,6 @@ router.post('/api/auth/change-password', authenticate, async (req, res) => {
         await employee.save();
 
         return response.success(res, null, 'Senha alterada com sucesso');
-
     } catch (error) {
         return response.error(res, error);
     }

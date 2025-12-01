@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const verifyToken = async () => {
             const storedToken = localStorage.getItem('token');
-            
+
             if (!storedToken) {
                 setLoading(false);
                 return;
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
             try {
                 const response = await fetch(`${API_URL}/api/auth/me`, {
                     headers: {
-                        'Authorization': `Bearer ${storedToken}`
+                        Authorization: `Bearer ${storedToken}`
                     }
                 });
 
@@ -118,9 +118,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={value}>
-            {children}
-        </AuthContext.Provider>
+        <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
     );
 };
 

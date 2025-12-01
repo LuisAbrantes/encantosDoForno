@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const response = require('../utils/responseHandler');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'encantos-do-forno-secret-key-2024';
+const JWT_SECRET =
+    process.env.JWT_SECRET || 'encantos-do-forno-secret-key-2024';
 const JWT_EXPIRES_IN = '7d'; // Token válido por 7 dias
 
 /**
@@ -9,7 +10,7 @@ const JWT_EXPIRES_IN = '7d'; // Token válido por 7 dias
  * @param {Object} payload - Dados do usuário (id, email, role)
  * @returns {string} Token JWT
  */
-const generateToken = (payload) => {
+const generateToken = payload => {
     return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
 
@@ -47,7 +48,11 @@ const requireAdmin = (req, res, next) => {
     if (req.user && req.user.role === 'admin') {
         next();
     } else {
-        return response.error(res, { message: 'Acesso negado. Requer privilégios de administrador.' }, 403);
+        return response.error(
+            res,
+            { message: 'Acesso negado. Requer privilégios de administrador.' },
+            403
+        );
     }
 };
 

@@ -32,7 +32,9 @@ const AdminLayout = () => {
                     <div className="px-6 py-3 bg-orange-800/50 border-y border-orange-700">
                         <p className="text-sm text-orange-200">Logado como:</p>
                         <p className="font-medium truncate">{user.name}</p>
-                        <p className="text-xs text-orange-300 truncate">{user.email}</p>
+                        <p className="text-xs text-orange-300 truncate">
+                            {user.email}
+                        </p>
                     </div>
                 )}
 
