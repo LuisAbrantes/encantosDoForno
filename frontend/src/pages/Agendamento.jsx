@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { scheduleService } from '../services/api';
 
 const Agendamento = () => {
     const [formData, setFormData] = useState({
@@ -10,6 +11,8 @@ const Agendamento = () => {
         pessoas: '2',
         observacoes: ''
     });
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ type: '', text: '' });
 
     const handleChange = e => {
         setFormData({
@@ -18,11 +21,45 @@ const Agendamento = () => {
         });
     };
 
-    const handleSubmit = e => {
+    const handleSubmit = async e => {
         e.preventDefault();
-        // TODO: Integrar com backend futuramente
-        alert('Reserva enviada! Entraremos em contato em breve.');
-        console.log('Dados da reserva:', formData);
+        setLoading(true);
+        setMessage({ type: '', text: '' });
+
+        try {
+            // Formatar dados para o backend
+            const scheduleData = {
+                Date: `${formData.data}T${formData.horario}:00`,
+                Peoples: formData.pessoas,
+                Number: formData.telefone
+            };
+
+            await scheduleService.create(scheduleData);
+
+            setMessage({
+                type: 'success',
+                text: '✅ Reserva realizada com sucesso! Entraremos em contato em breve.'
+            });
+
+            // Limpar formulário
+            setFormData({
+                nome: '',
+                email: '',
+                telefone: '',
+                data: '',
+                horario: '',
+                pessoas: '2',
+                observacoes: ''
+            });
+        } catch (error) {
+            console.error('Erro ao criar agendamento:', error);
+            setMessage({
+                type: 'error',
+                text: '❌ Erro ao fazer reserva. Tente novamente ou entre em contato pelo WhatsApp.'
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -44,6 +81,19 @@ const Agendamento = () => {
             <section className="py-16">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="bg-white rounded-lg shadow-2xl p-8 md:p-12">
+                        {/* Mensagem de feedback */}
+                        {message.text && (
+                            <div
+                                className={`mb-6 p-4 rounded-lg ${
+                                    message.type === 'success'
+                                        ? 'bg-green-100 text-green-800 border border-green-300'
+                                        : 'bg-red-100 text-red-800 border border-red-300'
+                                }`}
+                            >
+                                {message.text}
+                            </div>
+                        )}
+
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* Nome */}
                             <div>
@@ -208,9 +258,16 @@ const Agendamento = () => {
                             <div className="pt-4">
                                 <button
                                     type="submit"
-                                    className="w-full bg-orange-700 hover:bg-orange-800 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 hover:scale-105 shadow-lg"
+                                    disabled={loading}
+                                    className={`w-full bg-orange-700 hover:bg-orange-800 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 shadow-lg ${
+                                        loading
+                                            ? 'opacity-70 cursor-not-allowed'
+                                            : 'hover:scale-105'
+                                    }`}
                                 >
-                                    Confirmar Reserva 📅
+                                    {loading
+                                        ? 'Enviando...'
+                                        : 'Confirmar Reserva 📅'}
                                 </button>
                             </div>
                         </form>
