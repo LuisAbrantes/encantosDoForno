@@ -11,7 +11,8 @@ class ProductClassService extends BaseService {
      */
     formatProductClassData(data) {
         return {
-            Name: data.Name
+            Name: data.Name,
+            Icon: data.Icon || '🍽️'
         };
     }
 

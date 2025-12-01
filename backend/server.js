@@ -33,7 +33,8 @@ const initializeDatabase = async () => {
         require('./Data/Tables/Schedules');
         require('./Data/Tables/ProductClass');
 
-        await database.sync({ force: false });
+        // alter: true adiciona novas colunas sem perder dados existentes
+        await database.sync({ alter: true });
         console.log(chalk.bgGreen.black(' ✅ Banco sincronizado com sucesso '));
     } catch (error) {
         console.error(

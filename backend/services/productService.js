@@ -1,5 +1,6 @@
 const BaseService = require('./baseService');
 const Product = require('../Data/Tables/Products');
+const ProductClass = require('../Data/Tables/ProductClass');
 
 class ProductService extends BaseService {
     constructor() {
@@ -12,8 +13,9 @@ class ProductService extends BaseService {
     formatProductData(data) {
         return {
             Product_Name: data.Product_Name,
+            Product_Description: data.Product_Description || null,
             Product_Price: data.Product_Price,
-            Product_Weight: data.Product_Weight,
+            Product_Weight: data.Product_Weight || null,
             productClassId: Number(data.Product_Class || data.productClassId)
         };
     }
@@ -26,6 +28,13 @@ class ProductService extends BaseService {
     async update(id, data) {
         const formattedData = this.formatProductData(data);
         return await super.update(id, formattedData);
+    }
+
+    async findAll(options = {}) {
+        return await this.model.findAll({
+            ...options,
+            include: [{ model: ProductClass, as: 'Class' }]
+        });
     }
 
     async findByClass(classId) {
