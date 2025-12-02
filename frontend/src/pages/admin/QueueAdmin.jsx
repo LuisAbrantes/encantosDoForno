@@ -789,7 +789,7 @@ const QueueAdmin = () => {
                             {f === 'active' && 'Ativos'}
                             {f === 'waiting' && 'Aguardando'}
                             {f === 'called' && 'Chamados'}
-                            {f === 'all' && 'Todos'}
+                            {f === 'all' && 'Últimas 48h'}
                         </button>
                     ))}
                 </div>

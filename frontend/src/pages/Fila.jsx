@@ -458,6 +458,7 @@ const Fila = () => {
 
     /**
      * Busca status do usuário na fila
+     * Limpa localStorage automaticamente se entrada não existe ou expirou
      */
     const fetchUserStatus = useCallback(async entryId => {
         if (!entryId) return;
@@ -466,15 +467,45 @@ const Fila = () => {
             const response = await fetch(`${API_BASE}/queue/status/${entryId}`);
             const result = await response.json();
 
-            if (result.success) {
-                setUserStatus(result.data);
+            if (result.success && result.data) {
+                // Reseta contador de erros em caso de sucesso
+                sessionStorage.removeItem('queueErrorCount');
+
+                // Verifica se a entrada ainda está ativa
+                const activeStatuses = ['waiting', 'called'];
+                if (activeStatuses.includes(result.data.status)) {
+                    setUserStatus(result.data);
+                } else {
+                    // Entrada existe mas foi finalizada (seated, cancelled, no_show)
+                    console.log('Entrada finalizada:', result.data.status);
+                    localStorage.removeItem('queueEntryId');
+                    setUserStatus(null);
+                }
             } else {
-                // Usuário não está mais na fila
+                // Entrada não encontrada ou expirada - limpa localStorage
+                console.log('Entrada não encontrada, limpando localStorage');
                 localStorage.removeItem('queueEntryId');
                 setUserStatus(null);
             }
         } catch (err) {
             console.error('Erro ao buscar status:', err);
+            // Em caso de erro de rede persistente, também limpa
+            // para evitar usuário preso com entrada fantasma
+            // Usa um contador de erros para não limpar no primeiro erro
+            const errorCount = parseInt(
+                sessionStorage.getItem('queueErrorCount') || '0'
+            );
+            if (errorCount >= 3) {
+                console.log('Múltiplos erros de rede, limpando localStorage');
+                localStorage.removeItem('queueEntryId');
+                sessionStorage.removeItem('queueErrorCount');
+                setUserStatus(null);
+            } else {
+                sessionStorage.setItem(
+                    'queueErrorCount',
+                    String(errorCount + 1)
+                );
+            }
         }
     }, []);
 
@@ -545,6 +576,7 @@ const Fila = () => {
         if (!confirm(MESSAGES.CONFIRM_LEAVE)) return;
 
         setLoading(true);
+        setError(''); // Limpa erros anteriores
         const entryId = localStorage.getItem('queueEntryId');
 
         try {
@@ -554,15 +586,27 @@ const Fila = () => {
 
             const result = await response.json();
 
-            if (result.success) {
-                localStorage.removeItem('queueEntryId');
-                setUserStatus(null);
-                fetchQueueInfo();
-            } else {
-                setError(result.error || MESSAGES.ERROR_GENERIC);
+            // IDEMPOTENTE: Sempre limpa localStorage, independente do resultado
+            // Isso garante que o usuário sempre consegue "sair" da fila
+            localStorage.removeItem('queueEntryId');
+            setUserStatus(null);
+            fetchQueueInfo();
+
+            // Mostra feedback apropriado, mas não bloqueia
+            if (!result.success) {
+                // Entrada já foi finalizada/expirada - não é um erro real
+                console.log(
+                    'Entrada já finalizada:',
+                    result.message || result.error
+                );
             }
         } catch (err) {
-            setError(MESSAGES.ERROR_GENERIC);
+            // IDEMPOTENTE: Mesmo em erro de rede, limpa localStorage
+            // O objetivo é que o cliente não fique "preso" na fila
+            console.error('Erro ao sair da fila:', err);
+            localStorage.removeItem('queueEntryId');
+            setUserStatus(null);
+            fetchQueueInfo();
         } finally {
             setLoading(false);
         }

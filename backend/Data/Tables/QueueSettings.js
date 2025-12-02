@@ -4,13 +4,16 @@ const database = require('../config');
 // ============================================================
 // CONSTANTES
 // ============================================================
-const DEFAULT_SETTINGS = {
+const DEFAULT_SETTINGS = Object.freeze({
     MAX_QUEUE_SIZE: 50,
     AVERAGE_TURNOVER_MINUTES: 45,
     ESTIMATED_TIME_PER_PERSON: 3,
     OPENING_TIME: '11:00',
-    CLOSING_TIME: '22:00'
-};
+    CLOSING_TIME: '22:00',
+    MAX_WAIT_HOURS: 4, // Tempo máximo na fila antes de expirar
+    CALL_TIMEOUT_MINUTES: 30, // Tempo máximo após ser chamado sem resposta
+    HISTORY_RETENTION_HOURS: 48 // Tempo para manter entradas finalizadas antes de deletar
+});
 
 // ============================================================
 // MODELO
@@ -90,6 +93,57 @@ const QueueSettings = database.define(
             allowNull: true,
             comment:
                 'Template de mensagem para WhatsApp. Use {name} para nome do cliente.'
+        },
+        max_wait_hours: {
+            type: DataTypes.INTEGER,
+            defaultValue: DEFAULT_SETTINGS.MAX_WAIT_HOURS,
+            allowNull: false,
+            validate: {
+                min: {
+                    args: [1],
+                    msg: 'Tempo máximo de espera deve ser pelo menos 1 hora'
+                },
+                max: {
+                    args: [24],
+                    msg: 'Tempo máximo de espera não pode exceder 24 horas'
+                }
+            },
+            comment:
+                'Tempo máximo em horas que uma entrada pode ficar na fila antes de expirar'
+        },
+        call_timeout_minutes: {
+            type: DataTypes.INTEGER,
+            defaultValue: DEFAULT_SETTINGS.CALL_TIMEOUT_MINUTES,
+            allowNull: false,
+            validate: {
+                min: {
+                    args: [5],
+                    msg: 'Timeout de chamada deve ser pelo menos 5 minutos'
+                },
+                max: {
+                    args: [120],
+                    msg: 'Timeout de chamada não pode exceder 120 minutos'
+                }
+            },
+            comment:
+                'Tempo em minutos que cliente tem para responder após ser chamado'
+        },
+        history_retention_hours: {
+            type: DataTypes.INTEGER,
+            defaultValue: DEFAULT_SETTINGS.HISTORY_RETENTION_HOURS,
+            allowNull: false,
+            validate: {
+                min: {
+                    args: [24],
+                    msg: 'Retenção deve ser pelo menos 24 horas'
+                },
+                max: {
+                    args: [168],
+                    msg: 'Retenção não pode exceder 168 horas (7 dias)'
+                }
+            },
+            comment:
+                'Horas para manter entradas finalizadas antes de deletar automaticamente'
         }
     },
     {

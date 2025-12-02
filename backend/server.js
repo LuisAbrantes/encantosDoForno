@@ -47,6 +47,7 @@ const initializeDatabase = async () => {
         require('./Data/Tables/RestaurantTables');
         require('./Data/Tables/QueueSettings');
         require('./Data/Tables/TableLocations');
+        require('./Data/Tables/QueueDailyStats');
 
         // Configura associações entre modelos
         const setupAssociations = require('./Data/associations');
@@ -139,6 +140,14 @@ const setupGracefulShutdown = () => {
     const shutdown = async signal => {
         console.log(chalk.yellow(`\n⚠️  ${signal} recebido. Encerrando...`));
 
+        // Limpa os jobs agendados
+        if (global.cleanupIntervalId) {
+            clearInterval(global.cleanupIntervalId);
+        }
+        if (global.dailyStatsTimeoutId) {
+            clearTimeout(global.dailyStatsTimeoutId);
+        }
+
         try {
             const database = require('./Data/config');
             await database.close();
@@ -155,6 +164,113 @@ const setupGracefulShutdown = () => {
 };
 
 /**
+ * Configuração do job de limpeza automática da fila
+ * Executa a cada 15 minutos para expirar entradas antigas
+ */
+const setupQueueCleanupJob = () => {
+    const CLEANUP_INTERVAL_MS = 15 * 60 * 1000; // 15 minutos
+
+    const runCleanup = async () => {
+        try {
+            const queueService = require('./services/queueService');
+
+            // 1. Expira entradas waiting/called muito antigas
+            const result = await queueService.cleanupExpiredEntries();
+
+            if (result.total > 0) {
+                console.log(
+                    chalk.yellow('🧹 Limpeza automática da fila:'),
+                    chalk.gray(`${result.expiredWaiting} waiting expiradas,`),
+                    chalk.gray(`${result.expiredCalled} called sem resposta`)
+                );
+            }
+
+            // 2. Remove entradas finalizadas antigas (> 48h por padrão)
+            const deleted = await queueService.deleteOldFinishedEntries();
+            if (deleted > 0) {
+                console.log(
+                    chalk.yellow('🗑️  Entradas antigas removidas:'),
+                    chalk.gray(`${deleted} entradas`)
+                );
+            }
+        } catch (error) {
+            console.error(
+                chalk.red('❌ Erro na limpeza automática da fila:'),
+                error.message
+            );
+        }
+    };
+
+    // Executa imediatamente na inicialização
+    runCleanup();
+
+    // Agenda execução periódica
+    global.cleanupIntervalId = setInterval(runCleanup, CLEANUP_INTERVAL_MS);
+
+    console.log(
+        chalk.green('🧹 Job de limpeza da fila configurado'),
+        chalk.gray(`(a cada ${CLEANUP_INTERVAL_MS / 60000} minutos)`)
+    );
+};
+
+/**
+ * Configuração do job de agregação diária de estatísticas
+ * Executa à meia-noite para agregar estatísticas do dia anterior
+ */
+const setupDailyStatsJob = () => {
+    const runDailyAggregation = async () => {
+        try {
+            const queueService = require('./services/queueService');
+
+            // Agrega estatísticas do dia anterior
+            const stats = await queueService.aggregateDailyStats();
+
+            if (stats) {
+                console.log(
+                    chalk.blue('📊 Estatísticas diárias agregadas:'),
+                    chalk.gray(
+                        `${stats.total_customers} clientes, ${stats.customers_seated} sentados`
+                    )
+                );
+            }
+        } catch (error) {
+            console.error(
+                chalk.red('❌ Erro na agregação diária:'),
+                error.message
+            );
+        }
+    };
+
+    // Calcula tempo até próxima meia-noite
+    const scheduleNextRun = () => {
+        const now = new Date();
+        const nextMidnight = new Date(now);
+        nextMidnight.setDate(nextMidnight.getDate() + 1);
+        nextMidnight.setHours(0, 5, 0, 0); // 00:05 para evitar problemas de timezone
+
+        const msUntilMidnight = nextMidnight - now;
+
+        // Agenda execução à meia-noite
+        global.dailyStatsTimeoutId = setTimeout(() => {
+            runDailyAggregation();
+            // Re-agenda para próximo dia
+            scheduleNextRun();
+        }, msUntilMidnight);
+
+        console.log(
+            chalk.green('📊 Job de estatísticas diárias configurado'),
+            chalk.gray(`(próxima execução: ${nextMidnight.toLocaleString()})`)
+        );
+    };
+
+    // Executa imediatamente na inicialização (para dias anteriores não processados)
+    runDailyAggregation();
+
+    // Agenda próxima execução
+    scheduleNextRun();
+};
+
+/**
  * Inicialização do servidor
  */
 const startServer = async () => {
@@ -162,6 +278,8 @@ const startServer = async () => {
     configureMiddlewares();
     configureRoutes();
     setupGracefulShutdown();
+    setupQueueCleanupJob();
+    setupDailyStatsJob();
 
     app.listen(PORT, () => {
         console.log(

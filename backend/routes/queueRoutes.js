@@ -89,12 +89,13 @@ router.put('/api/queue/:id', async (req, res) => {
 /**
  * DELETE /api/queue/:id
  * Cancela/sai da fila
+ * IDEMPOTENTE: Retorna sucesso mesmo se entrada já foi finalizada/expirada
  */
 router.delete('/api/queue/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        await queueService.cancelEntry(parseInt(id));
-        responseHandler.success(res, null, 'Saída da fila realizada');
+        const result = await queueService.cancelEntry(parseInt(id));
+        responseHandler.success(res, result, result.message);
     } catch (error) {
         responseHandler.error(res, error.message);
     }
@@ -314,7 +315,10 @@ router.put(
                 'closing_time',
                 'auto_close_before_closing',
                 'whatsapp_notification_enabled',
-                'whatsapp_message_template'
+                'whatsapp_message_template',
+                'max_wait_hours',
+                'call_timeout_minutes',
+                'history_retention_hours'
             ];
 
             const updateData = {};
@@ -348,5 +352,125 @@ router.put('/api/queue/settings/toggle', authenticate, async (req, res) => {
         responseHandler.error(res, error.message);
     }
 });
+
+// ============================================================
+// ROTAS DE LIMPEZA (CLEANUP)
+// ============================================================
+
+/**
+ * POST /api/queue/cleanup
+ * Executa limpeza manual de entradas expiradas (Admin)
+ */
+router.post(
+    '/api/queue/cleanup',
+    authenticate,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const result = await queueService.cleanupExpiredEntries();
+            responseHandler.success(
+                res,
+                result,
+                `Limpeza concluída: ${result.total} entradas expiradas`
+            );
+        } catch (error) {
+            responseHandler.error(res, error.message);
+        }
+    }
+);
+
+/**
+ * GET /api/queue/cleanup/stats
+ * Obtém estatísticas de entradas pendentes de limpeza
+ */
+router.get('/api/queue/cleanup/stats', authenticate, async (req, res) => {
+    try {
+        const stats = await queueService.getCleanupStats();
+        responseHandler.success(res, stats, 'Estatísticas de limpeza');
+    } catch (error) {
+        responseHandler.error(res, error.message);
+    }
+});
+
+/**
+ * DELETE /api/queue/purge
+ * Remove entradas antigas do histórico (Admin)
+ * Query params: daysToKeep (default: 30)
+ */
+router.delete(
+    '/api/queue/purge',
+    authenticate,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const daysToKeep = parseInt(req.query.daysToKeep) || 30;
+            const deleted = await queueService.purgeOldEntries(daysToKeep);
+            responseHandler.success(
+                res,
+                { deleted, daysToKeep },
+                `${deleted} entradas removidas do histórico`
+            );
+        } catch (error) {
+            responseHandler.error(res, error.message);
+        }
+    }
+);
+
+// ============================================================
+// ROTAS DE ESTATÍSTICAS HISTÓRICAS
+// ============================================================
+
+/**
+ * GET /api/queue/stats/daily
+ * Obtém estatísticas diárias agregadas (histórico)
+ * Query params: days (default: 30)
+ */
+router.get('/api/queue/stats/daily', authenticate, async (req, res) => {
+    try {
+        const days = parseInt(req.query.days) || 30;
+        const stats = await queueService.getDailyStatsHistory(days);
+        responseHandler.success(
+            res,
+            stats,
+            `Estatísticas dos últimos ${days} dias`
+        );
+    } catch (error) {
+        responseHandler.error(res, error.message);
+    }
+});
+
+/**
+ * POST /api/queue/stats/aggregate
+ * Força agregação manual de estatísticas de uma data (Admin)
+ * Body: { date: 'YYYY-MM-DD' } (opcional, default: ontem)
+ */
+router.post(
+    '/api/queue/stats/aggregate',
+    authenticate,
+    requireAdmin,
+    async (req, res) => {
+        try {
+            const { date } = req.body;
+            const targetDate = date ? new Date(date) : null;
+            const stats = await queueService.aggregateDailyStats(targetDate);
+
+            if (!stats) {
+                return responseHandler.success(
+                    res,
+                    null,
+                    'Nenhum dado para agregar nesta data'
+                );
+            }
+
+            responseHandler.success(
+                res,
+                stats,
+                'Estatísticas agregadas com sucesso'
+            );
+        } catch (error) {
+            responseHandler.error(res, error.message);
+        }
+    }
+);
 
 module.exports = router;

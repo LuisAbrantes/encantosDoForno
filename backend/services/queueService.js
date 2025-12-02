@@ -3,6 +3,7 @@ const sequelize = require('../Data/config');
 const Queue = require('../Data/Tables/Queue');
 const RestaurantTables = require('../Data/Tables/RestaurantTables');
 const QueueSettings = require('../Data/Tables/QueueSettings');
+const QueueDailyStats = require('../Data/Tables/QueueDailyStats');
 const { QUEUE_STATUS, QUEUE_PRIORITY } = require('../Data/Tables/Queue');
 const { TABLE_STATUS } = require('../Data/Tables/RestaurantTables');
 
@@ -160,14 +161,19 @@ class QueueService {
 
     /**
      * Busca entrada por ID ou telefone
+     * IMPORTANTE: Sempre filtra por status ativo para evitar retornar entradas finalizadas
      * @private
      */
     async _findEntryByIdentifier(identifier) {
         const isNumericId =
             !isNaN(identifier) && !String(identifier).includes('-');
 
+        // Sempre filtra por status ativo, independente do tipo de busca
         const whereClause = isNumericId
-            ? { id: parseInt(identifier) }
+            ? {
+                  id: parseInt(identifier),
+                  status: { [Op.in]: ACTIVE_STATUSES }
+              }
             : {
                   phone_number: this._sanitizePhone(identifier),
                   status: { [Op.in]: ACTIVE_STATUSES }
@@ -225,22 +231,38 @@ class QueueService {
 
     /**
      * Cancela entrada na fila (cliente)
+     * IDEMPOTENTE: Retorna sucesso mesmo se entrada não existe ou já foi finalizada
+     * Isso garante que o cliente sempre consegue "sair" da fila
      * @param {number} id - ID da entrada
-     * @returns {Promise<boolean>}
+     * @returns {Promise<Object>} { success: true, alreadyFinished?: boolean }
      */
     async cancelEntry(id) {
         const entry = await Queue.findByPk(id);
 
+        // Idempotente: se não existe, considera como sucesso (já saiu/expirou)
         if (!entry) {
-            throw new Error('Entrada não encontrada');
+            return {
+                success: true,
+                alreadyFinished: true,
+                message: 'Entrada já removida ou expirada'
+            };
         }
 
+        // Idempotente: se já foi finalizada, considera como sucesso
         if (!ACTIVE_STATUSES.includes(entry.status)) {
-            throw new Error('Esta entrada já foi finalizada');
+            return {
+                success: true,
+                alreadyFinished: true,
+                message: 'Entrada já finalizada'
+            };
         }
 
         await entry.cancel();
-        return true;
+        return {
+            success: true,
+            alreadyFinished: false,
+            message: 'Saída da fila realizada'
+        };
     }
 
     // ========================================================
@@ -623,6 +645,318 @@ class QueueService {
         return Math.round(
             (waitingCount / availableTables) * settings.average_turnover_minutes
         );
+    }
+
+    // ========================================================
+    // MÉTODOS DE LIMPEZA (CLEANUP)
+    // ========================================================
+
+    /**
+     * Limpa entradas expiradas da fila
+     * - Entradas 'waiting' além do tempo máximo configurado → cancelled
+     * - Entradas 'called' sem resposta além do timeout → no_show
+     *
+     * @returns {Promise<Object>} { expiredWaiting, expiredCalled, total }
+     */
+    async cleanupExpiredEntries() {
+        const settings = await QueueSettings.getSettings();
+
+        // Calcula horário de expiração para 'waiting'
+        const waitingExpirationTime = new Date();
+        waitingExpirationTime.setHours(
+            waitingExpirationTime.getHours() - settings.max_wait_hours
+        );
+
+        // Calcula horário de expiração para 'called'
+        const calledExpirationTime = new Date();
+        calledExpirationTime.setMinutes(
+            calledExpirationTime.getMinutes() - settings.call_timeout_minutes
+        );
+
+        // Expira entradas 'waiting' antigas
+        const [expiredWaiting] = await Queue.update(
+            { status: QUEUE_STATUS.CANCELLED },
+            {
+                where: {
+                    status: QUEUE_STATUS.WAITING,
+                    entry_time: { [Op.lt]: waitingExpirationTime }
+                }
+            }
+        );
+
+        // Expira entradas 'called' sem resposta (marca como no_show)
+        const [expiredCalled] = await Queue.update(
+            { status: QUEUE_STATUS.NO_SHOW },
+            {
+                where: {
+                    status: QUEUE_STATUS.CALLED,
+                    called_time: { [Op.lt]: calledExpirationTime }
+                }
+            }
+        );
+
+        return {
+            expiredWaiting,
+            expiredCalled,
+            total: expiredWaiting + expiredCalled
+        };
+    }
+
+    /**
+     * Remove entradas antigas do histórico (mais de X dias)
+     * Útil para manutenção e performance do banco
+     *
+     * @param {number} daysToKeep - Dias para manter no histórico (default: 30)
+     * @returns {Promise<number>} Número de entradas removidas
+     */
+    async purgeOldEntries(daysToKeep = 30) {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
+
+        const deleted = await Queue.destroy({
+            where: {
+                status: {
+                    [Op.in]: [
+                        QUEUE_STATUS.SEATED,
+                        QUEUE_STATUS.NO_SHOW,
+                        QUEUE_STATUS.CANCELLED
+                    ]
+                },
+                entry_time: { [Op.lt]: cutoffDate }
+            }
+        });
+
+        return deleted;
+    }
+
+    /**
+     * Obtém estatísticas de limpeza (para monitoramento)
+     * @returns {Promise<Object>} Estatísticas de entradas pendentes de limpeza
+     */
+    async getCleanupStats() {
+        const settings = await QueueSettings.getSettings();
+
+        const waitingExpirationTime = new Date();
+        waitingExpirationTime.setHours(
+            waitingExpirationTime.getHours() - settings.max_wait_hours
+        );
+
+        const calledExpirationTime = new Date();
+        calledExpirationTime.setMinutes(
+            calledExpirationTime.getMinutes() - settings.call_timeout_minutes
+        );
+
+        const [expiredWaitingCount, expiredCalledCount] = await Promise.all([
+            Queue.count({
+                where: {
+                    status: QUEUE_STATUS.WAITING,
+                    entry_time: { [Op.lt]: waitingExpirationTime }
+                }
+            }),
+            Queue.count({
+                where: {
+                    status: QUEUE_STATUS.CALLED,
+                    called_time: { [Op.lt]: calledExpirationTime }
+                }
+            })
+        ]);
+
+        return {
+            expiredWaitingCount,
+            expiredCalledCount,
+            totalPendingCleanup: expiredWaitingCount + expiredCalledCount,
+            settings: {
+                maxWaitHours: settings.max_wait_hours,
+                callTimeoutMinutes: settings.call_timeout_minutes
+            }
+        };
+    }
+
+    /**
+     * Agrega estatísticas diárias e salva no QueueDailyStats
+     * @param {Date} [date] - Data para agregar (default: ontem)
+     * @returns {Promise<Object>} Estatísticas agregadas
+     */
+    async aggregateDailyStats(date = null) {
+        // Por padrão, agrega o dia anterior (dia completo)
+        const targetDate = date || new Date();
+        if (!date) {
+            targetDate.setDate(targetDate.getDate() - 1);
+        }
+
+        // Normaliza para início e fim do dia
+        const startOfDay = new Date(targetDate);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(targetDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const dateString = startOfDay.toISOString().split('T')[0];
+
+        // Busca todas as entradas finalizadas do dia
+        const entries = await Queue.findAll({
+            where: {
+                entry_time: {
+                    [Op.between]: [startOfDay, endOfDay]
+                },
+                status: {
+                    [Op.in]: [
+                        QUEUE_STATUS.SEATED,
+                        QUEUE_STATUS.NO_SHOW,
+                        QUEUE_STATUS.CANCELLED
+                    ]
+                }
+            },
+            attributes: [
+                'id',
+                'status',
+                'party_size',
+                'entry_time',
+                'seated_time',
+                'called_time'
+            ],
+            raw: true
+        });
+
+        // Se não houver dados, não cria registro
+        if (entries.length === 0) {
+            return null;
+        }
+
+        // Calcula métricas
+        const stats = this._calculateDailyMetrics(entries);
+        stats.date = dateString;
+
+        // Upsert - atualiza se já existir
+        const [dailyStats, created] = await QueueDailyStats.upsert(stats, {
+            returning: true
+        });
+
+        console.log(
+            `[QueueService] Daily stats ${
+                created ? 'created' : 'updated'
+            } for ${dateString}: ${entries.length} entries`
+        );
+
+        return dailyStats;
+    }
+
+    /**
+     * Calcula métricas diárias a partir de entradas
+     * @private
+     * @param {Array} entries - Entradas do dia
+     * @returns {Object} Métricas calculadas
+     */
+    _calculateDailyMetrics(entries) {
+        const seatedEntries = entries.filter(
+            e => e.status === QUEUE_STATUS.SEATED
+        );
+        const noShowEntries = entries.filter(
+            e => e.status === QUEUE_STATUS.NO_SHOW
+        );
+        const cancelledEntries = entries.filter(
+            e => e.status === QUEUE_STATUS.CANCELLED
+        );
+
+        // Tempo de espera (para clientes que foram sentados)
+        const waitTimes = seatedEntries
+            .filter(e => e.seated_time && e.entry_time)
+            .map(e => {
+                const entry = new Date(e.entry_time);
+                const seated = new Date(e.seated_time);
+                return (seated - entry) / (1000 * 60); // minutos
+            });
+
+        const avgWait =
+            waitTimes.length > 0
+                ? Math.round(
+                      waitTimes.reduce((a, b) => a + b, 0) / waitTimes.length
+                  )
+                : 0;
+        const maxWait =
+            waitTimes.length > 0 ? Math.round(Math.max(...waitTimes)) : 0;
+
+        // Hora de pico
+        const hourCounts = {};
+        entries.forEach(e => {
+            const hour = new Date(e.entry_time).getHours();
+            hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+        });
+        const peakHour =
+            Object.entries(hourCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ||
+            null;
+
+        // Tamanho de grupo mais comum
+        const sizeCounts = {};
+        entries.forEach(e => {
+            sizeCounts[e.party_size] = (sizeCounts[e.party_size] || 0) + 1;
+        });
+        const mostCommonSize =
+            Object.entries(sizeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ||
+            null;
+
+        // Total de pessoas
+        const totalPartySize = entries.reduce(
+            (sum, e) => sum + (e.party_size || 0),
+            0
+        );
+
+        return {
+            total_customers: entries.length,
+            customers_seated: seatedEntries.length,
+            customers_no_show: noShowEntries.length,
+            customers_cancelled: cancelledEntries.length,
+            average_wait_minutes: avgWait,
+            max_wait_minutes: maxWait,
+            peak_hour: peakHour ? parseInt(peakHour, 10) : null,
+            most_common_party_size: mostCommonSize
+                ? parseInt(mostCommonSize, 10)
+                : null,
+            total_party_size: totalPartySize
+        };
+    }
+
+    /**
+     * Remove entradas antigas já finalizadas (após retenção)
+     * Deve ser chamado APÓS aggregateDailyStats para não perder dados
+     * @returns {Promise<number>} Quantidade de entradas removidas
+     */
+    async deleteOldFinishedEntries() {
+        const settings = await QueueSettings.getSettings();
+        const retentionHours = settings.history_retention_hours || 48;
+
+        const cutoffTime = new Date();
+        cutoffTime.setHours(cutoffTime.getHours() - retentionHours);
+
+        const deleted = await Queue.destroy({
+            where: {
+                status: {
+                    [Op.in]: [
+                        QUEUE_STATUS.SEATED,
+                        QUEUE_STATUS.NO_SHOW,
+                        QUEUE_STATUS.CANCELLED
+                    ]
+                },
+                updatedAt: { [Op.lt]: cutoffTime }
+            }
+        });
+
+        if (deleted > 0) {
+            console.log(
+                `[QueueService] Deleted ${deleted} finished entries older than ${retentionHours}h`
+            );
+        }
+
+        return deleted;
+    }
+
+    /**
+     * Obtém estatísticas históricas agregadas
+     * @param {number} [days=30] - Quantidade de dias
+     * @returns {Promise<Array>} Estatísticas diárias
+     */
+    async getDailyStatsHistory(days = 30) {
+        return QueueDailyStats.getRecentStats(days);
     }
 
     // ========================================================
