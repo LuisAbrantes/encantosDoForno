@@ -11,17 +11,24 @@ const ProductClasses = require('../Data/Tables/ProductClass');
 //? EDIT PRODUCT
 router.post('/api/edit/product', async (req, res) => {
     try {
-        const [updatedCount] = await Products.update(
-            {
-                Product_Name: req.body.Product_Name,
-                Product_Price: req.body.Product_Price,
-                Product_Weight: req.body.Product_Weight,
-                productClassId: Number(req.body.Product_Class)
-            },
-            {
-                where: { id: req.body.id }
-            }
-        );
+        const updateData = {
+            Product_Name: req.body.Product_Name,
+            Product_Price: req.body.Product_Price,
+            Product_Weight: req.body.Product_Weight,
+            productClassId: Number(req.body.Product_Class)
+        };
+
+        // Campos opcionais
+        if (req.body.Product_Image !== undefined) {
+            updateData.Product_Image = req.body.Product_Image;
+        }
+        if (req.body.is_featured !== undefined) {
+            updateData.is_featured = Boolean(req.body.is_featured);
+        }
+
+        const [updatedCount] = await Products.update(updateData, {
+            where: { id: req.body.id }
+        });
         if (updatedCount === 0) {
             return res
                 .status(404)
@@ -48,12 +55,10 @@ router.post('/api/edit/schedule', async (req, res) => {
             }
         );
         if (updatedCount === 0) {
-            return res
-                .status(404)
-                .json({
-                    success: false,
-                    message: 'Agendamento não encontrado'
-                });
+            return res.status(404).json({
+                success: false,
+                message: 'Agendamento não encontrado'
+            });
         }
         res.json({
             success: true,

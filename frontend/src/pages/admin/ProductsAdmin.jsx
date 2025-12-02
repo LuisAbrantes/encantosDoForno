@@ -12,7 +12,9 @@ const ProductsAdmin = () => {
         Product_Description: '',
         Product_Price: '',
         Product_Weight: '',
-        Product_Class: ''
+        Product_Class: '',
+        Product_Image: '',
+        is_featured: false
     });
 
     useEffect(() => {
@@ -42,7 +44,9 @@ const ProductsAdmin = () => {
                 Product_Description: product.Product_Description || '',
                 Product_Price: product.Product_Price,
                 Product_Weight: product.Product_Weight || '',
-                Product_Class: product.productClassId
+                Product_Class: product.productClassId,
+                Product_Image: product.Product_Image || '',
+                is_featured: product.is_featured || false
             });
         } else {
             setEditingProduct(null);
@@ -51,7 +55,9 @@ const ProductsAdmin = () => {
                 Product_Description: '',
                 Product_Price: '',
                 Product_Weight: '',
-                Product_Class: classes[0]?.id || ''
+                Product_Class: classes[0]?.id || '',
+                Product_Image: '',
+                is_featured: false
             });
         }
         setShowModal(true);
@@ -147,6 +153,9 @@ const ProductsAdmin = () => {
                                     Peso
                                 </th>
                                 <th className="px-6 py-3 text-center text-sm font-semibold text-gray-600">
+                                    Destaque
+                                </th>
+                                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-600">
                                     Ações
                                 </th>
                             </tr>
@@ -176,6 +185,20 @@ const ProductsAdmin = () => {
                                     </td>
                                     <td className="px-6 py-4 text-gray-600">
                                         {product.Product_Weight || '-'}
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        {product.is_featured ? (
+                                            <span
+                                                className="text-amber-500 text-xl"
+                                                title="Em destaque"
+                                            >
+                                                ⭐
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-300 text-xl">
+                                                ☆
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <button
@@ -304,6 +327,45 @@ const ProductsAdmin = () => {
                                         </option>
                                     ))}
                                 </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Imagem (emoji ou URL)
+                                </label>
+                                <input
+                                    type="text"
+                                    value={formData.Product_Image}
+                                    onChange={e =>
+                                        setFormData({
+                                            ...formData,
+                                            Product_Image: e.target.value
+                                        })
+                                    }
+                                    placeholder="Ex: 🍕 ou https://..."
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                                />
+                            </div>
+
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="is_featured"
+                                    checked={formData.is_featured}
+                                    onChange={e =>
+                                        setFormData({
+                                            ...formData,
+                                            is_featured: e.target.checked
+                                        })
+                                    }
+                                    className="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                                />
+                                <label
+                                    htmlFor="is_featured"
+                                    className="ml-2 text-sm font-medium text-gray-700"
+                                >
+                                    ⭐ Exibir em destaque na página inicial
+                                </label>
                             </div>
 
                             <div className="flex justify-end gap-4 mt-6">

@@ -150,6 +150,22 @@ router.get('/api', async (req, res) => {
         res.send(HTMLERRORMAKER(ERR));
     }
 });
+//? GET FEATURED PRODUCTS (para Landing Page)
+router.get('/api/products/featured', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 6;
+        const featuredProducts = await Products.findAll({
+            where: { is_featured: true },
+            limit,
+            include: [{ model: ProductClasses, as: 'Class' }]
+        });
+        res.json(featuredProducts);
+    } catch (ERR) {
+        console.error(ERR);
+        res.status(500).json({ error: 'Erro ao buscar produtos em destaque' });
+    }
+});
+
 //? GET ALL PRODUCTS
 router.get('/api/products', async (req, res) => {
     try {

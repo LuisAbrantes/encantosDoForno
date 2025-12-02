@@ -32,6 +32,8 @@ const apiRequest = async (endpoint, options = {}) => {
  */
 export const productService = {
     getAll: () => apiRequest('/api/products'),
+    getFeatured: (limit = 6) =>
+        apiRequest(`/api/products/featured?limit=${limit}`),
     getByClass: classId => apiRequest(`/api/products/class/${classId}`),
     getSorted: (direction = 'asc') =>
         apiRequest(`/api/products/order/${direction}`),

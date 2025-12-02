@@ -23,6 +23,17 @@ const Products = database.define('Products', {
     Product_Weight: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    Product_Image: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: 'URL ou emoji do produto'
+    },
+    is_featured: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+        comment: 'Produto em destaque na landing page'
     }
 });
 
