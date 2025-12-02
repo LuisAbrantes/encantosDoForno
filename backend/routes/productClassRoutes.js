@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { productClassService } = require('../services');
-const response = require('../utils/responseHandler');
+const { responseHandler } = require('../utils/responseHandler');
 const { MESSAGES } = require('../utils/constants');
 
 /**
@@ -11,9 +11,9 @@ const { MESSAGES } = require('../utils/constants');
 router.get('/api/classes', async (req, res) => {
     try {
         const classes = await productClassService.findAll();
-        return response.success(res, classes);
+        return responseHandler.success(res, classes);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -24,13 +24,13 @@ router.get('/api/classes', async (req, res) => {
 router.post('/api/classes', async (req, res) => {
     try {
         const productClass = await productClassService.create(req.body);
-        return response.created(
+        return responseHandler.created(
             res,
             productClass,
             MESSAGES.PRODUCT_CLASS.CREATED
         );
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -46,12 +46,19 @@ router.put('/api/classes/:id', async (req, res) => {
         );
 
         if (updatedCount === 0) {
-            return response.notFound(res, MESSAGES.PRODUCT_CLASS.NOT_FOUND);
+            return responseHandler.notFound(
+                res,
+                MESSAGES.PRODUCT_CLASS.NOT_FOUND
+            );
         }
 
-        return response.success(res, null, MESSAGES.PRODUCT_CLASS.UPDATED);
+        return responseHandler.success(
+            res,
+            null,
+            MESSAGES.PRODUCT_CLASS.UPDATED
+        );
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -64,12 +71,19 @@ router.delete('/api/classes/:id', async (req, res) => {
         const deletedCount = await productClassService.delete(req.params.id);
 
         if (deletedCount === 0) {
-            return response.notFound(res, MESSAGES.PRODUCT_CLASS.NOT_FOUND);
+            return responseHandler.notFound(
+                res,
+                MESSAGES.PRODUCT_CLASS.NOT_FOUND
+            );
         }
 
-        return response.success(res, null, MESSAGES.PRODUCT_CLASS.DELETED);
+        return responseHandler.success(
+            res,
+            null,
+            MESSAGES.PRODUCT_CLASS.DELETED
+        );
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 

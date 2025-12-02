@@ -15,6 +15,8 @@ import ProductsAdmin from './pages/admin/ProductsAdmin';
 import ClassesAdmin from './pages/admin/ClassesAdmin';
 import SchedulesAdmin from './pages/admin/SchedulesAdmin';
 import EmployeesAdmin from './pages/admin/EmployeesAdmin';
+import QueueAdmin from './pages/admin/QueueAdmin';
+import TablesAdmin from './pages/admin/TablesAdmin';
 import Login from './pages/admin/Login';
 import './App.css';
 
@@ -40,6 +42,8 @@ function App() {
                         <Route path="classes" element={<ClassesAdmin />} />
                         <Route path="schedules" element={<SchedulesAdmin />} />
                         <Route path="employees" element={<EmployeesAdmin />} />
+                        <Route path="queue" element={<QueueAdmin />} />
+                        <Route path="tables" element={<TablesAdmin />} />
                     </Route>
 
                     {/* Public Routes - with Navbar/Footer */}

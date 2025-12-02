@@ -7,10 +7,16 @@ const productService = require('./productService');
 const scheduleService = require('./scheduleService');
 const employeeService = require('./employeeService');
 const productClassService = require('./productClassService');
+const queueService = require('./queueService');
+const tableService = require('./tableService');
+const tableLocationService = require('./tableLocationService');
 
 module.exports = {
     productService,
     scheduleService,
     employeeService,
-    productClassService
+    productClassService,
+    queueService,
+    tableService,
+    tableLocationService
 };

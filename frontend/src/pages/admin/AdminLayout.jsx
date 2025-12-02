@@ -12,6 +12,8 @@ const AdminLayout = () => {
         { path: '/admin/products', label: 'Produtos', icon: '🍕' },
         { path: '/admin/classes', label: 'Categorias', icon: '📁' },
         { path: '/admin/schedules', label: 'Agendamentos', icon: '📅' },
+        { path: '/admin/queue', label: 'Fila de Espera', icon: '🎫' },
+        { path: '/admin/tables', label: 'Mesas', icon: '🪑' },
         ...(user?.role === 'admin'
             ? [{ path: '/admin/employees', label: 'Funcionários', icon: '👥' }]
             : [])

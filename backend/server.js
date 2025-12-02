@@ -9,7 +9,10 @@ const {
     scheduleRoutes,
     employeeRoutes,
     productClassRoutes,
-    authRoutes
+    authRoutes,
+    queueRoutes,
+    tableRoutes,
+    tableLocationRoutes
 } = require('./routes');
 
 // Importação das rotas legadas (para manter compatibilidade)
@@ -33,6 +36,14 @@ const initializeDatabase = async () => {
         require('./Data/Tables/Products');
         require('./Data/Tables/Schedules');
         require('./Data/Tables/ProductClass');
+        require('./Data/Tables/Queue');
+        require('./Data/Tables/RestaurantTables');
+        require('./Data/Tables/QueueSettings');
+        require('./Data/Tables/TableLocations');
+
+        // Configura associações entre modelos
+        const setupAssociations = require('./Data/associations');
+        setupAssociations();
 
         // alter: true adiciona novas colunas sem perder dados existentes
         await database.sync({ alter: true });
@@ -67,6 +78,9 @@ const configureRoutes = () => {
     app.use(scheduleRoutes);
     app.use(employeeRoutes);
     app.use(productClassRoutes);
+    app.use(queueRoutes);
+    app.use(tableRoutes);
+    app.use(tableLocationRoutes);
 
     // Rotas legadas (mantidas para compatibilidade)
     app.use(GET);

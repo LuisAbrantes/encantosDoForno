@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { employeeService } = require('../services');
-const response = require('../utils/responseHandler');
+const { responseHandler } = require('../utils/responseHandler');
 const { MESSAGES } = require('../utils/constants');
 
 /**
@@ -11,9 +11,9 @@ const { MESSAGES } = require('../utils/constants');
 router.get('/api/employees', async (req, res) => {
     try {
         const employees = await employeeService.findAll();
-        return response.success(res, employees);
+        return responseHandler.success(res, employees);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -24,9 +24,13 @@ router.get('/api/employees', async (req, res) => {
 router.post('/api/employees', async (req, res) => {
     try {
         const employee = await employeeService.create(req.body);
-        return response.created(res, employee, MESSAGES.EMPLOYEE.CREATED);
+        return responseHandler.created(
+            res,
+            employee,
+            MESSAGES.EMPLOYEE.CREATED
+        );
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -42,12 +46,12 @@ router.put('/api/employees/:id', async (req, res) => {
         );
 
         if (updatedCount === 0) {
-            return response.notFound(res, MESSAGES.EMPLOYEE.NOT_FOUND);
+            return responseHandler.notFound(res, MESSAGES.EMPLOYEE.NOT_FOUND);
         }
 
-        return response.success(res, null, MESSAGES.EMPLOYEE.UPDATED);
+        return responseHandler.success(res, null, MESSAGES.EMPLOYEE.UPDATED);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -60,12 +64,12 @@ router.delete('/api/employees/:id', async (req, res) => {
         const deletedCount = await employeeService.delete(req.params.id);
 
         if (deletedCount === 0) {
-            return response.notFound(res, MESSAGES.EMPLOYEE.NOT_FOUND);
+            return responseHandler.notFound(res, MESSAGES.EMPLOYEE.NOT_FOUND);
         }
 
-        return response.success(res, null, MESSAGES.EMPLOYEE.DELETED);
+        return responseHandler.success(res, null, MESSAGES.EMPLOYEE.DELETED);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 

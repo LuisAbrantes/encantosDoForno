@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const response = require('../utils/responseHandler');
+const { responseHandler } = require('../utils/responseHandler');
 
 const JWT_SECRET =
     process.env.JWT_SECRET || 'encantos-do-forno-secret-key-2024';
@@ -18,12 +18,12 @@ const generateToken = payload => {
  * Middleware para verificar autenticação
  * Verifica se o token JWT é válido
  */
-const authenticate = (req, res, next) => {
+const authenticateToken = (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return response.error(res, { message: 'Token não fornecido' }, 401);
+            return responseHandler.unauthorized(res, 'Token não fornecido');
         }
 
         const token = authHeader.split(' ')[1];
@@ -34,31 +34,31 @@ const authenticate = (req, res, next) => {
         next();
     } catch (error) {
         if (error.name === 'TokenExpiredError') {
-            return response.error(res, { message: 'Token expirado' }, 401);
+            return responseHandler.unauthorized(res, 'Token expirado');
         }
-        return response.error(res, { message: 'Token inválido' }, 401);
+        return responseHandler.unauthorized(res, 'Token inválido');
     }
 };
 
 /**
  * Middleware para verificar se o usuário é admin
- * Deve ser usado após o middleware authenticate
+ * Deve ser usado após o middleware authenticateToken
  */
 const requireAdmin = (req, res, next) => {
     if (req.user && req.user.role === 'admin') {
         next();
     } else {
-        return response.error(
+        return responseHandler.forbidden(
             res,
-            { message: 'Acesso negado. Requer privilégios de administrador.' },
-            403
+            'Acesso negado. Requer privilégios de administrador.'
         );
     }
 };
 
 module.exports = {
     generateToken,
-    authenticate,
+    authenticateToken,
+    authenticate: authenticateToken, // Alias para compatibilidade
     requireAdmin,
     JWT_SECRET
 };

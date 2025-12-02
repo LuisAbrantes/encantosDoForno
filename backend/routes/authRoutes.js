@@ -6,7 +6,7 @@ const {
     authenticate,
     requireAdmin
 } = require('../middleware/auth');
-const response = require('../utils/responseHandler');
+const { responseHandler } = require('../utils/responseHandler');
 
 // ============================================================
 // CONSTANTES DE VALIDAÇÃO
@@ -73,7 +73,7 @@ router.post('/api/auth/login', async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return response.error(
+            return responseHandler.error(
                 res,
                 { message: VALIDATION.MESSAGES.EMAIL_PASSWORD_REQUIRED },
                 400
@@ -85,7 +85,7 @@ router.post('/api/auth/login', async (req, res) => {
         });
 
         if (!employee) {
-            return response.error(
+            return responseHandler.error(
                 res,
                 { message: VALIDATION.MESSAGES.INVALID_CREDENTIALS },
                 401
@@ -95,7 +95,7 @@ router.post('/api/auth/login', async (req, res) => {
         const isValidPassword = await employee.validatePassword(password);
 
         if (!isValidPassword) {
-            return response.error(
+            return responseHandler.error(
                 res,
                 { message: VALIDATION.MESSAGES.INVALID_CREDENTIALS },
                 401
@@ -103,14 +103,14 @@ router.post('/api/auth/login', async (req, res) => {
         }
 
         const authData = createAuthResponse(employee);
-        return response.success(
+        return responseHandler.success(
             res,
             authData,
             VALIDATION.MESSAGES.LOGIN_SUCCESS
         );
     } catch (error) {
         console.error('Erro no login:', error);
-        return response.error(res, error);
+        return responseHandler.error(res, error);
     }
 });
 
@@ -132,7 +132,7 @@ router.post(
             const { name, email, password, role } = req.body;
 
             if (!name || !email || !password) {
-                return response.error(
+                return responseHandler.error(
                     res,
                     { message: VALIDATION.MESSAGES.ALL_FIELDS_REQUIRED },
                     400
@@ -144,7 +144,7 @@ router.post(
             });
 
             if (existingEmployee) {
-                return response.error(
+                return responseHandler.error(
                     res,
                     { message: VALIDATION.MESSAGES.EMAIL_EXISTS },
                     409
@@ -158,14 +158,14 @@ router.post(
                 Role: role || 'employee'
             });
 
-            return response.created(
+            return responseHandler.created(
                 res,
                 { user: formatUserResponse(employee) },
                 VALIDATION.MESSAGES.REGISTER_SUCCESS
             );
         } catch (error) {
             console.error('Erro no registro:', error);
-            return response.error(res, error);
+            return responseHandler.error(res, error);
         }
     }
 );
@@ -196,10 +196,10 @@ router.get('/api/employees', authenticate, requireAdmin, async (req, res) => {
             createdAt: emp.createdAt
         }));
 
-        return response.success(res, formattedEmployees);
+        return responseHandler.success(res, formattedEmployees);
     } catch (error) {
         console.error('Erro ao listar funcionários:', error);
-        return response.error(res, error);
+        return responseHandler.error(res, error);
     }
 });
 
@@ -218,7 +218,7 @@ router.delete(
 
             // Impede que o admin delete a si mesmo
             if (parseInt(id) === req.user.id) {
-                return response.error(
+                return responseHandler.error(
                     res,
                     { message: 'Você não pode remover sua própria conta' },
                     400
@@ -228,21 +228,21 @@ router.delete(
             const employee = await Employees.findByPk(id);
 
             if (!employee) {
-                return response.notFound(
+                return responseHandler.notFound(
                     res,
                     VALIDATION.MESSAGES.USER_NOT_FOUND
                 );
             }
 
             await employee.destroy();
-            return response.success(
+            return responseHandler.success(
                 res,
                 null,
                 'Funcionário removido com sucesso'
             );
         } catch (error) {
             console.error('Erro ao remover funcionário:', error);
-            return response.error(res, error);
+            return responseHandler.error(res, error);
         }
     }
 );
@@ -263,12 +263,15 @@ router.get('/api/auth/me', authenticate, async (req, res) => {
         });
 
         if (!employee) {
-            return response.notFound(res, VALIDATION.MESSAGES.USER_NOT_FOUND);
+            return responseHandler.notFound(
+                res,
+                VALIDATION.MESSAGES.USER_NOT_FOUND
+            );
         }
 
-        return response.success(res, formatUserResponse(employee));
+        return responseHandler.success(res, formatUserResponse(employee));
     } catch (error) {
-        return response.error(res, error);
+        return responseHandler.error(res, error);
     }
 });
 
@@ -282,7 +285,7 @@ router.post('/api/auth/change-password', authenticate, async (req, res) => {
         const { currentPassword, newPassword } = req.body;
 
         if (!currentPassword || !newPassword) {
-            return response.error(
+            return responseHandler.error(
                 res,
                 { message: VALIDATION.MESSAGES.CURRENT_PASSWORD_REQUIRED },
                 400
@@ -292,7 +295,10 @@ router.post('/api/auth/change-password', authenticate, async (req, res) => {
         const employee = await Employees.findByPk(req.user.id);
 
         if (!employee) {
-            return response.notFound(res, VALIDATION.MESSAGES.USER_NOT_FOUND);
+            return responseHandler.notFound(
+                res,
+                VALIDATION.MESSAGES.USER_NOT_FOUND
+            );
         }
 
         const isValidPassword = await employee.validatePassword(
@@ -300,7 +306,7 @@ router.post('/api/auth/change-password', authenticate, async (req, res) => {
         );
 
         if (!isValidPassword) {
-            return response.error(
+            return responseHandler.error(
                 res,
                 { message: VALIDATION.MESSAGES.WRONG_PASSWORD },
                 401
@@ -310,13 +316,13 @@ router.post('/api/auth/change-password', authenticate, async (req, res) => {
         employee.Employed_Password = newPassword;
         await employee.save();
 
-        return response.success(
+        return responseHandler.success(
             res,
             null,
             VALIDATION.MESSAGES.PASSWORD_CHANGED
         );
     } catch (error) {
-        return response.error(res, error);
+        return responseHandler.error(res, error);
     }
 });
 

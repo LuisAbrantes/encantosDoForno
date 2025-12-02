@@ -1,106 +1,623 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+
+// ============================================================
+// CONSTANTES
+// ============================================================
+const API_BASE = 'http://localhost:3000/api';
+const POLLING_INTERVAL = 10000; // 10 segundos
+
+const STATUS_CONFIG = {
+    waiting: {
+        color: 'bg-gray-400',
+        text: 'Aguardando',
+        bgClass: 'border-gray-200 bg-white'
+    },
+    called: {
+        color: 'bg-green-500 animate-pulse',
+        text: 'Sua vez! 🔔',
+        bgClass: 'border-green-500 bg-green-50 shadow-lg'
+    }
+};
+
+const MESSAGES = {
+    QUEUE_CLOSED: 'A fila está fechada no momento. Volte mais tarde!',
+    QUEUE_FULL:
+        'A fila está cheia no momento. Tente novamente em alguns minutos.',
+    ALREADY_IN_QUEUE: 'Este telefone já está na fila.',
+    SUCCESS_JOIN: 'Você entrou na fila! Fique atento ao seu celular.',
+    CONFIRM_LEAVE: 'Deseja sair da fila?',
+    ERROR_GENERIC: 'Ocorreu um erro. Tente novamente.'
+};
+
+// ============================================================
+// COMPONENTES AUXILIARES
+// ============================================================
+
+/**
+ * Componente de status da fila
+ */
+const QueueStats = ({ queueInfo, loading }) => {
+    if (loading) {
+        return (
+            <section className="py-8 bg-white shadow-lg">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center text-gray-500">
+                        Carregando...
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    return (
+        <section className="py-8 bg-white shadow-lg">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="grid md:grid-cols-3 gap-6 text-center">
+                    <div className="p-6 bg-amber-50 rounded-lg">
+                        <div className="text-4xl font-bold text-orange-900 mb-2">
+                            {queueInfo?.currentWaiting || 0}
+                        </div>
+                        <div className="text-gray-600">Pessoas na fila</div>
+                    </div>
+                    <div className="p-6 bg-amber-50 rounded-lg">
+                        <div className="text-4xl font-bold text-orange-900 mb-2">
+                            ~{queueInfo?.estimatedWaitMinutes || 0} min
+                        </div>
+                        <div className="text-gray-600">
+                            Tempo médio de espera
+                        </div>
+                    </div>
+                    <div className="p-6 bg-amber-50 rounded-lg">
+                        <div
+                            className={`text-4xl font-bold mb-2 ${
+                                queueInfo?.isOpen
+                                    ? 'text-green-600'
+                                    : 'text-red-600'
+                            }`}
+                        >
+                            ●
+                        </div>
+                        <div className="text-gray-600">
+                            {queueInfo?.isOpen ? 'Fila aberta' : 'Fila fechada'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+/**
+ * Item da fila
+ */
+const QueueItem = ({ item, index, isCurrentUser }) => {
+    const statusConfig = STATUS_CONFIG[item.status] || STATUS_CONFIG.waiting;
+    const isNext = index === 1 && item.status === 'waiting';
+
+    return (
+        <div
+            className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                isCurrentUser
+                    ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-300'
+                    : isNext
+                    ? 'border-amber-500 bg-amber-50'
+                    : statusConfig.bgClass
+            }`}
+        >
+            <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                    <div className="flex flex-col items-center">
+                        <div
+                            className={`w-3 h-3 rounded-full ${
+                                isNext ? 'bg-amber-500' : statusConfig.color
+                            }`}
+                        ></div>
+                        <div className="text-xs text-gray-500 mt-1">
+                            #{index}
+                        </div>
+                    </div>
+                    <div>
+                        <div className="font-bold text-gray-800">
+                            {item.customer_name}
+                            {isCurrentUser && (
+                                <span className="ml-2 text-xs bg-blue-500 text-white px-2 py-1 rounded">
+                                    Você
+                                </span>
+                            )}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                            {item.party_size}{' '}
+                            {item.party_size === 1 ? 'pessoa' : 'pessoas'}
+                        </div>
+                    </div>
+                </div>
+                <div className="text-right">
+                    <div className="text-sm font-semibold text-orange-900">
+                        ~
+                        {item.estimated_wait_minutes ||
+                            item.waitTimeMinutes ||
+                            0}{' '}
+                        min
+                    </div>
+                    <div className="text-xs text-gray-500">
+                        {isNext ? 'Próximo na fila' : statusConfig.text}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+/**
+ * Lista de informações
+ */
+const InfoBox = () => (
+    <div className="mt-6 p-6 bg-blue-50 rounded-lg border border-blue-200">
+        <h3 className="font-bold text-blue-900 mb-3 flex items-center">
+            <span className="text-2xl mr-2">💡</span>
+            Como funciona?
+        </h3>
+        <ul className="space-y-2 text-gray-700 text-sm">
+            <li>• Entre na fila preenchendo o formulário ao lado</li>
+            <li>• Acompanhe sua posição em tempo real nesta página</li>
+            <li>• Quando estiver próximo, você será notificado via WhatsApp</li>
+            <li>• Quando for sua vez, seu nome aparecerá como "Chamando"</li>
+            <li>• Dirija-se à recepção do restaurante</li>
+        </ul>
+    </div>
+);
+
+/**
+ * Formulário de entrada na fila
+ */
+const JoinQueueForm = ({
+    formData,
+    onChange,
+    onSubmit,
+    loading,
+    estimatedWait,
+    canJoin,
+    queueInfo
+}) => (
+    <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky top-24">
+        <h2 className="text-3xl font-bold text-orange-900 mb-6 flex items-center">
+            <span className="text-4xl mr-3">📝</span>
+            Entrar na Fila
+        </h2>
+
+        {!queueInfo?.isOpen && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 font-semibold">
+                    {MESSAGES.QUEUE_CLOSED}
+                </p>
+                <p className="text-sm text-red-600 mt-1">
+                    Horário: {queueInfo?.openingTime || '11:00'} às{' '}
+                    {queueInfo?.closingTime || '22:00'}
+                </p>
+            </div>
+        )}
+
+        {queueInfo?.isFull && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-amber-700 font-semibold">
+                    {MESSAGES.QUEUE_FULL}
+                </p>
+            </div>
+        )}
+
+        <form onSubmit={onSubmit} className="space-y-6">
+            <div>
+                <label
+                    htmlFor="nome"
+                    className="block text-sm font-bold text-orange-900 mb-2"
+                >
+                    Nome *
+                </label>
+                <input
+                    type="text"
+                    id="nome"
+                    name="customer_name"
+                    required
+                    value={formData.customer_name}
+                    onChange={onChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-600 focus:border-transparent transition duration-300"
+                    placeholder="Seu nome"
+                    disabled={!canJoin || loading}
+                />
+            </div>
+
+            <div>
+                <label
+                    htmlFor="telefone"
+                    className="block text-sm font-bold text-orange-900 mb-2"
+                >
+                    Telefone (WhatsApp) *
+                </label>
+                <input
+                    type="tel"
+                    id="telefone"
+                    name="phone_number"
+                    required
+                    value={formData.phone_number}
+                    onChange={onChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-600 focus:border-transparent transition duration-300"
+                    placeholder="(12) 99999-9999"
+                    disabled={!canJoin || loading}
+                />
+            </div>
+
+            <div>
+                <label
+                    htmlFor="pessoas"
+                    className="block text-sm font-bold text-orange-900 mb-2"
+                >
+                    Número de Pessoas *
+                </label>
+                <select
+                    id="pessoas"
+                    name="party_size"
+                    required
+                    value={formData.party_size}
+                    onChange={onChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-600 focus:border-transparent transition duration-300"
+                    disabled={!canJoin || loading}
+                >
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                        <option key={n} value={n}>
+                            {n} {n === 1 ? 'pessoa' : 'pessoas'}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <button
+                type="submit"
+                disabled={!canJoin || loading}
+                className="w-full bg-orange-700 hover:bg-orange-800 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+                {loading ? 'Entrando...' : 'Entrar na Fila 🎫'}
+            </button>
+        </form>
+
+        <div className="mt-6 p-4 bg-amber-50 rounded-lg">
+            <p className="text-sm text-gray-700 text-center">
+                ⏱️ Tempo estimado de espera:{' '}
+                <strong>~{estimatedWait} minutos</strong>
+            </p>
+        </div>
+    </div>
+);
+
+/**
+ * Card do usuário na fila
+ */
+const UserInQueueCard = ({
+    userStatus,
+    onLeave,
+    onUpdatePartySize,
+    loading
+}) => {
+    const [editing, setEditing] = useState(false);
+    const [newPartySize, setNewPartySize] = useState(
+        userStatus?.party_size || 2
+    );
+
+    const handleSave = () => {
+        onUpdatePartySize(newPartySize);
+        setEditing(false);
+    };
+
+    return (
+        <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky top-24">
+            <div className="text-center">
+                <div className="text-6xl mb-4">
+                    {userStatus?.status === 'called' ? '🔔' : '✅'}
+                </div>
+                <h2
+                    className={`text-3xl font-bold mb-4 ${
+                        userStatus?.status === 'called'
+                            ? 'text-green-700 animate-pulse'
+                            : 'text-green-700'
+                    }`}
+                >
+                    {userStatus?.status === 'called'
+                        ? 'Sua mesa está pronta!'
+                        : 'Você está na fila!'}
+                </h2>
+
+                <div
+                    className={`border rounded-lg p-6 mb-6 ${
+                        userStatus?.status === 'called'
+                            ? 'bg-green-100 border-green-300'
+                            : 'bg-green-50 border-green-200'
+                    }`}
+                >
+                    <p className="text-lg text-gray-700 mb-2">
+                        Olá, <strong>{userStatus?.customer_name}</strong>!
+                    </p>
+                    <p className="text-3xl font-bold text-green-700 mb-2">
+                        {userStatus?.status === 'called'
+                            ? 'Sua vez chegou!'
+                            : `Posição: #${userStatus?.position || '-'}`}
+                    </p>
+                    <p className="text-gray-600">
+                        {editing ? (
+                            <span className="flex items-center justify-center gap-2">
+                                <select
+                                    value={newPartySize}
+                                    onChange={e =>
+                                        setNewPartySize(e.target.value)
+                                    }
+                                    className="px-2 py-1 border rounded"
+                                >
+                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                                        <option key={n} value={n}>
+                                            {n}
+                                        </option>
+                                    ))}
+                                </select>
+                                <button
+                                    onClick={handleSave}
+                                    className="text-green-600 hover:text-green-800"
+                                >
+                                    ✓
+                                </button>
+                                <button
+                                    onClick={() => setEditing(false)}
+                                    className="text-red-600 hover:text-red-800"
+                                >
+                                    ✕
+                                </button>
+                            </span>
+                        ) : (
+                            <span>
+                                {userStatus?.party_size}{' '}
+                                {userStatus?.party_size === 1
+                                    ? 'pessoa'
+                                    : 'pessoas'}
+                                <button
+                                    onClick={() => setEditing(true)}
+                                    className="ml-2 text-blue-600 hover:text-blue-800 text-sm"
+                                >
+                                    ✏️ Editar
+                                </button>
+                            </span>
+                        )}
+                    </p>
+                    {userStatus?.status !== 'called' && (
+                        <p className="text-gray-600 mt-2">
+                            Tempo de espera:{' '}
+                            <strong>
+                                ~{userStatus?.estimatedWaitMinutes || 0} min
+                            </strong>
+                        </p>
+                    )}
+                </div>
+
+                {userStatus?.status === 'called' ? (
+                    <p className="text-green-700 font-semibold mb-6">
+                        Por favor, dirija-se à recepção do restaurante!
+                    </p>
+                ) : (
+                    <p className="text-gray-600 mb-6">
+                        Fique atento! Enviaremos uma notificação quando estiver
+                        próximo da sua vez.
+                    </p>
+                )}
+
+                <button
+                    onClick={onLeave}
+                    disabled={loading}
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 disabled:opacity-50"
+                >
+                    {loading ? 'Saindo...' : 'Sair da Fila'}
+                </button>
+            </div>
+        </div>
+    );
+};
+
+// ============================================================
+// COMPONENTE PRINCIPAL
+// ============================================================
 
 const Fila = () => {
-    // Mock data - será substituído por dados reais do backend
-    const [filaAtual, setFilaAtual] = useState([
-        {
-            id: 1,
-            nome: 'João S.',
-            pessoas: 4,
-            status: 'chamando',
-            tempo: 'Agora'
-        },
-        {
-            id: 2,
-            nome: 'Maria P.',
-            pessoas: 2,
-            status: 'proximo',
-            tempo: '~5 min'
-        },
-        {
-            id: 3,
-            nome: 'Carlos E.',
-            pessoas: 3,
-            status: 'aguardando',
-            tempo: '~10 min'
-        },
-        {
-            id: 4,
-            nome: 'Ana L.',
-            pessoas: 2,
-            status: 'aguardando',
-            tempo: '~15 min'
-        },
-        {
-            id: 5,
-            nome: 'Pedro M.',
-            pessoas: 5,
-            status: 'aguardando',
-            tempo: '~20 min'
-        }
-    ]);
-
-    const [tempoEspera, setTempoEspera] = useState(15);
-    const [usuarioNaFila, setUsuarioNaFila] = useState(null);
+    // Estado
+    const [queueInfo, setQueueInfo] = useState(null);
+    const [queueList, setQueueList] = useState([]);
+    const [userStatus, setUserStatus] = useState(null);
     const [formData, setFormData] = useState({
-        nome: '',
-        telefone: '',
-        pessoas: '2'
+        customer_name: '',
+        phone_number: '',
+        party_size: '2'
     });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    // Simula atualização em tempo real
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setTempoEspera(prev =>
-                Math.max(5, prev + Math.floor(Math.random() * 3) - 1)
-            );
-        }, 5000);
-        return () => clearInterval(interval);
+    // Recupera ID salvo do localStorage
+    const savedEntryId = localStorage.getItem('queueEntryId');
+
+    // ========================================================
+    // FUNÇÕES DE API
+    // ========================================================
+
+    /**
+     * Busca informações públicas da fila
+     */
+    const fetchQueueInfo = useCallback(async () => {
+        try {
+            const response = await fetch(`${API_BASE}/queue/info`);
+            const result = await response.json();
+            if (result.success) {
+                setQueueInfo(result.data);
+            }
+        } catch (err) {
+            console.error('Erro ao buscar info da fila:', err);
+        }
     }, []);
+
+    /**
+     * Busca status do usuário na fila
+     */
+    const fetchUserStatus = useCallback(async entryId => {
+        if (!entryId) return;
+
+        try {
+            const response = await fetch(`${API_BASE}/queue/status/${entryId}`);
+            const result = await response.json();
+
+            if (result.success) {
+                setUserStatus(result.data);
+            } else {
+                // Usuário não está mais na fila
+                localStorage.removeItem('queueEntryId');
+                setUserStatus(null);
+            }
+        } catch (err) {
+            console.error('Erro ao buscar status:', err);
+        }
+    }, []);
+
+    /**
+     * Busca lista pública da fila (limitada)
+     */
+    const fetchQueueList = useCallback(async () => {
+        try {
+            // Usa o endpoint de info que já tem a contagem
+            // A lista pública mostra apenas posições, não dados sensíveis
+            const response = await fetch(`${API_BASE}/queue/info`);
+            const result = await response.json();
+            if (result.success) {
+                // Simula lista básica com base na contagem
+                // O backend não expõe lista completa publicamente
+                setQueueList([]);
+            }
+        } catch (err) {
+            console.error('Erro ao buscar lista:', err);
+        }
+    }, []);
+
+    // ========================================================
+    // HANDLERS
+    // ========================================================
 
     const handleChange = e => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
         });
+        setError('');
     };
 
-    const handleEntrarNaFila = e => {
+    const handleJoinQueue = async e => {
         e.preventDefault();
-        const novoUsuario = {
-            id: filaAtual.length + 1,
-            nome: formData.nome,
-            pessoas: parseInt(formData.pessoas),
-            status: 'aguardando',
-            tempo: `~${(filaAtual.length + 1) * 5} min`
-        };
-        setFilaAtual([...filaAtual, novoUsuario]);
-        setUsuarioNaFila(novoUsuario);
-        // TODO: Integrar com backend
-        alert('Você entrou na fila! Fique atento ao seu celular.');
-    };
+        setLoading(true);
+        setError('');
 
-    const getStatusColor = status => {
-        switch (status) {
-            case 'chamando':
-                return 'bg-green-500 animate-pulse';
-            case 'proximo':
-                return 'bg-amber-500';
-            default:
-                return 'bg-gray-400';
+        try {
+            const response = await fetch(`${API_BASE}/queue`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    customer_name: formData.customer_name,
+                    phone_number: formData.phone_number.replace(/\D/g, ''),
+                    party_size: parseInt(formData.party_size)
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                localStorage.setItem('queueEntryId', result.data.id);
+                setUserStatus(result.data);
+                alert(MESSAGES.SUCCESS_JOIN);
+            } else {
+                setError(result.error || MESSAGES.ERROR_GENERIC);
+            }
+        } catch (err) {
+            setError(MESSAGES.ERROR_GENERIC);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const getStatusText = status => {
-        switch (status) {
-            case 'chamando':
-                return 'Sua vez! 🔔';
-            case 'proximo':
-                return 'Próximo na fila';
-            default:
-                return 'Aguardando';
+    const handleLeaveQueue = async () => {
+        if (!confirm(MESSAGES.CONFIRM_LEAVE)) return;
+
+        setLoading(true);
+        const entryId = localStorage.getItem('queueEntryId');
+
+        try {
+            const response = await fetch(`${API_BASE}/queue/${entryId}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                localStorage.removeItem('queueEntryId');
+                setUserStatus(null);
+                fetchQueueInfo();
+            } else {
+                setError(result.error || MESSAGES.ERROR_GENERIC);
+            }
+        } catch (err) {
+            setError(MESSAGES.ERROR_GENERIC);
+        } finally {
+            setLoading(false);
         }
     };
+
+    const handleUpdatePartySize = async newSize => {
+        const entryId = localStorage.getItem('queueEntryId');
+        if (!entryId) return;
+
+        try {
+            const response = await fetch(`${API_BASE}/queue/${entryId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ party_size: parseInt(newSize) })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                setUserStatus(result.data);
+            }
+        } catch (err) {
+            console.error('Erro ao atualizar:', err);
+        }
+    };
+
+    // ========================================================
+    // EFEITOS
+    // ========================================================
+
+    // Carrega dados iniciais
+    useEffect(() => {
+        fetchQueueInfo();
+        fetchQueueList();
+
+        if (savedEntryId) {
+            fetchUserStatus(savedEntryId);
+        }
+    }, [fetchQueueInfo, fetchQueueList, fetchUserStatus, savedEntryId]);
+
+    // Polling para atualização em tempo real
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchQueueInfo();
+
+            if (savedEntryId) {
+                fetchUserStatus(savedEntryId);
+            }
+        }, POLLING_INTERVAL);
+
+        return () => clearInterval(interval);
+    }, [fetchQueueInfo, fetchUserStatus, savedEntryId]);
+
+    // ========================================================
+    // RENDER
+    // ========================================================
 
     return (
         <div className="min-h-screen bg-amber-50">
@@ -117,36 +634,20 @@ const Fila = () => {
             </section>
 
             {/* Status da Fila */}
-            <section className="py-8 bg-white shadow-lg">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid md:grid-cols-3 gap-6 text-center">
-                        <div className="p-6 bg-amber-50 rounded-lg">
-                            <div className="text-4xl font-bold text-orange-900 mb-2">
-                                {filaAtual.length}
-                            </div>
-                            <div className="text-gray-600">Pessoas na fila</div>
-                        </div>
-                        <div className="p-6 bg-amber-50 rounded-lg">
-                            <div className="text-4xl font-bold text-orange-900 mb-2">
-                                ~{tempoEspera} min
-                            </div>
-                            <div className="text-gray-600">
-                                Tempo médio de espera
-                            </div>
-                        </div>
-                        <div className="p-6 bg-amber-50 rounded-lg">
-                            <div className="text-4xl font-bold text-green-600 mb-2">
-                                ●
-                            </div>
-                            <div className="text-gray-600">Sistema ativo</div>
-                        </div>
+            <QueueStats queueInfo={queueInfo} loading={!queueInfo} />
+
+            {/* Erro */}
+            {error && (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                        {error}
                     </div>
                 </div>
-            </section>
+            )}
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                 <div className="grid lg:grid-cols-2 gap-8">
-                    {/* Fila Atual */}
+                    {/* Lado esquerdo - Informações */}
                     <div>
                         <div className="bg-white rounded-lg shadow-xl p-6 md:p-8">
                             <h2 className="text-3xl font-bold text-orange-900 mb-6 flex items-center">
@@ -154,235 +655,71 @@ const Fila = () => {
                                 Fila Atual
                             </h2>
 
-                            <div className="space-y-4">
-                                {filaAtual.map((pessoa, index) => (
-                                    <div
-                                        key={pessoa.id}
-                                        className={`p-4 rounded-lg border-2 transition-all duration-300 ${
-                                            pessoa.status === 'chamando'
-                                                ? 'border-green-500 bg-green-50 shadow-lg'
-                                                : pessoa.status === 'proximo'
-                                                ? 'border-amber-500 bg-amber-50'
-                                                : 'border-gray-200 bg-white'
-                                        }`}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center space-x-4">
-                                                <div className="flex flex-col items-center">
-                                                    <div
-                                                        className={`w-3 h-3 rounded-full ${getStatusColor(
-                                                            pessoa.status
-                                                        )}`}
-                                                    ></div>
-                                                    <div className="text-xs text-gray-500 mt-1">
-                                                        #{index + 1}
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div className="font-bold text-gray-800">
-                                                        {pessoa.nome}
-                                                    </div>
-                                                    <div className="text-sm text-gray-600">
-                                                        {pessoa.pessoas}{' '}
-                                                        {pessoa.pessoas === 1
-                                                            ? 'pessoa'
-                                                            : 'pessoas'}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="text-sm font-semibold text-orange-900">
-                                                    {pessoa.tempo}
-                                                </div>
-                                                <div className="text-xs text-gray-500">
-                                                    {getStatusText(
-                                                        pessoa.status
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                            {queueInfo?.currentWaiting === 0 ? (
+                                <div className="text-center py-8 text-gray-500">
+                                    <span className="text-4xl mb-4 block">
+                                        🎉
+                                    </span>
+                                    Nenhuma pessoa na fila! Entre agora.
+                                </div>
+                            ) : userStatus ? (
+                                <div className="space-y-4">
+                                    <QueueItem
+                                        item={userStatus}
+                                        index={userStatus.position}
+                                        isCurrentUser={true}
+                                    />
+                                    {userStatus.position > 1 && (
+                                        <p className="text-center text-gray-500 text-sm">
+                                            {userStatus.position - 1}{' '}
+                                            {userStatus.position - 1 === 1
+                                                ? 'pessoa na sua frente'
+                                                : 'pessoas na sua frente'}
+                                        </p>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-gray-500">
+                                    <p className="mb-2">
+                                        <strong>
+                                            {queueInfo?.currentWaiting || 0}
+                                        </strong>{' '}
+                                        {queueInfo?.currentWaiting === 1
+                                            ? 'pessoa aguardando'
+                                            : 'pessoas aguardando'}
+                                    </p>
+                                    <p className="text-sm">
+                                        Entre na fila para acompanhar sua
+                                        posição
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Informações */}
-                        <div className="mt-6 p-6 bg-blue-50 rounded-lg border border-blue-200">
-                            <h3 className="font-bold text-blue-900 mb-3 flex items-center">
-                                <span className="text-2xl mr-2">💡</span>
-                                Como funciona?
-                            </h3>
-                            <ul className="space-y-2 text-gray-700 text-sm">
-                                <li>
-                                    • Entre na fila preenchendo o formulário ao
-                                    lado
-                                </li>
-                                <li>
-                                    • Acompanhe sua posição em tempo real nesta
-                                    página
-                                </li>
-                                <li>
-                                    • Você receberá uma notificação por SMS
-                                    quando estiver próximo
-                                </li>
-                                <li>
-                                    • Quando for sua vez, seu nome será chamado
-                                    no painel
-                                </li>
-                                <li>
-                                    • Aguarde no local indicado ou retorne ao
-                                    restaurante
-                                </li>
-                            </ul>
-                        </div>
+                        <InfoBox />
                     </div>
 
-                    {/* Formulário de Entrada */}
+                    {/* Lado direito - Formulário ou Status */}
                     <div>
-                        {!usuarioNaFila ? (
-                            <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky top-24">
-                                <h2 className="text-3xl font-bold text-orange-900 mb-6 flex items-center">
-                                    <span className="text-4xl mr-3">📝</span>
-                                    Entrar na Fila
-                                </h2>
-
-                                <form
-                                    onSubmit={handleEntrarNaFila}
-                                    className="space-y-6"
-                                >
-                                    <div>
-                                        <label
-                                            htmlFor="nome"
-                                            className="block text-sm font-bold text-orange-900 mb-2"
-                                        >
-                                            Nome *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="nome"
-                                            name="nome"
-                                            required
-                                            value={formData.nome}
-                                            onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-600 focus:border-transparent transition duration-300"
-                                            placeholder="Seu nome"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            htmlFor="telefone"
-                                            className="block text-sm font-bold text-orange-900 mb-2"
-                                        >
-                                            Telefone (para notificações) *
-                                        </label>
-                                        <input
-                                            type="tel"
-                                            id="telefone"
-                                            name="telefone"
-                                            required
-                                            value={formData.telefone}
-                                            onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-600 focus:border-transparent transition duration-300"
-                                            placeholder="(12) 99999-9999"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label
-                                            htmlFor="pessoas"
-                                            className="block text-sm font-bold text-orange-900 mb-2"
-                                        >
-                                            Número de Pessoas *
-                                        </label>
-                                        <select
-                                            id="pessoas"
-                                            name="pessoas"
-                                            required
-                                            value={formData.pessoas}
-                                            onChange={handleChange}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-600 focus:border-transparent transition duration-300"
-                                        >
-                                            <option value="1">1 pessoa</option>
-                                            <option value="2">2 pessoas</option>
-                                            <option value="3">3 pessoas</option>
-                                            <option value="4">4 pessoas</option>
-                                            <option value="5">5 pessoas</option>
-                                            <option value="6">6 pessoas</option>
-                                            <option value="7+">
-                                                7 ou mais pessoas
-                                            </option>
-                                        </select>
-                                    </div>
-
-                                    <button
-                                        type="submit"
-                                        className="w-full bg-orange-700 hover:bg-orange-800 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 hover:scale-105 shadow-lg"
-                                    >
-                                        Entrar na Fila 🎫
-                                    </button>
-                                </form>
-
-                                <div className="mt-6 p-4 bg-amber-50 rounded-lg">
-                                    <p className="text-sm text-gray-700 text-center">
-                                        ⏱️ Tempo estimado de espera:{' '}
-                                        <strong>~{tempoEspera} minutos</strong>
-                                    </p>
-                                </div>
-                            </div>
+                        {!userStatus ? (
+                            <JoinQueueForm
+                                formData={formData}
+                                onChange={handleChange}
+                                onSubmit={handleJoinQueue}
+                                loading={loading}
+                                estimatedWait={
+                                    queueInfo?.estimatedWaitMinutes || 0
+                                }
+                                canJoin={queueInfo?.canJoin}
+                                queueInfo={queueInfo}
+                            />
                         ) : (
-                            <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky top-24">
-                                <div className="text-center">
-                                    <div className="text-6xl mb-4">✅</div>
-                                    <h2 className="text-3xl font-bold text-green-700 mb-4">
-                                        Você está na fila!
-                                    </h2>
-                                    <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
-                                        <p className="text-lg text-gray-700 mb-2">
-                                            Olá,{' '}
-                                            <strong>
-                                                {usuarioNaFila.nome}
-                                            </strong>
-                                            !
-                                        </p>
-                                        <p className="text-3xl font-bold text-green-700 mb-2">
-                                            Posição: #
-                                            {filaAtual.findIndex(
-                                                p => p.id === usuarioNaFila.id
-                                            ) + 1}
-                                        </p>
-                                        <p className="text-gray-600">
-                                            Tempo estimado:{' '}
-                                            <strong>
-                                                {usuarioNaFila.tempo}
-                                            </strong>
-                                        </p>
-                                    </div>
-                                    <p className="text-gray-600 mb-6">
-                                        Fique atento! Enviaremos uma notificação
-                                        quando estiver próximo da sua vez.
-                                    </p>
-                                    <button
-                                        onClick={() => {
-                                            if (
-                                                confirm('Deseja sair da fila?')
-                                            ) {
-                                                setFilaAtual(
-                                                    filaAtual.filter(
-                                                        p =>
-                                                            p.id !==
-                                                            usuarioNaFila.id
-                                                    )
-                                                );
-                                                setUsuarioNaFila(null);
-                                            }
-                                        }}
-                                        className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300"
-                                    >
-                                        Sair da Fila
-                                    </button>
-                                </div>
-                            </div>
+                            <UserInQueueCard
+                                userStatus={userStatus}
+                                onLeave={handleLeaveQueue}
+                                onUpdatePartySize={handleUpdatePartySize}
+                                loading={loading}
+                            />
                         )}
                     </div>
                 </div>

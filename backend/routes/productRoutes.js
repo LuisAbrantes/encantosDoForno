@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { productService } = require('../services');
-const response = require('../utils/responseHandler');
+const { responseHandler } = require('../utils/responseHandler');
 const { MESSAGES } = require('../utils/constants');
 
 /**
@@ -11,9 +11,9 @@ const { MESSAGES } = require('../utils/constants');
 router.get('/api/products', async (req, res) => {
     try {
         const products = await productService.findAll();
-        return response.success(res, products);
+        return responseHandler.success(res, products);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -24,9 +24,9 @@ router.get('/api/products', async (req, res) => {
 router.get('/api/products/class/:classId', async (req, res) => {
     try {
         const products = await productService.findByClass(req.params.classId);
-        return response.success(res, products);
+        return responseHandler.success(res, products);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -38,9 +38,9 @@ router.get('/api/products/order/:direction', async (req, res) => {
     try {
         const order = req.params.direction === 'desc' ? 'DESC' : 'ASC';
         const products = await productService.findAllSorted(order);
-        return response.success(res, products);
+        return responseHandler.success(res, products);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -57,9 +57,9 @@ router.get(
                 order,
                 req.params.classId
             );
-            return response.success(res, products);
+            return responseHandler.success(res, products);
         } catch (err) {
-            return response.error(res, err);
+            return responseHandler.error(res, err);
         }
     }
 );
@@ -71,9 +71,9 @@ router.get(
 router.post('/api/products', async (req, res) => {
     try {
         const product = await productService.create(req.body);
-        return response.created(res, product, MESSAGES.PRODUCT.CREATED);
+        return responseHandler.created(res, product, MESSAGES.PRODUCT.CREATED);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -89,12 +89,12 @@ router.put('/api/products/:id', async (req, res) => {
         );
 
         if (updatedCount === 0) {
-            return response.notFound(res, MESSAGES.PRODUCT.NOT_FOUND);
+            return responseHandler.notFound(res, MESSAGES.PRODUCT.NOT_FOUND);
         }
 
-        return response.success(res, null, MESSAGES.PRODUCT.UPDATED);
+        return responseHandler.success(res, null, MESSAGES.PRODUCT.UPDATED);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -107,12 +107,12 @@ router.delete('/api/products/:id', async (req, res) => {
         const deletedCount = await productService.delete(req.params.id);
 
         if (deletedCount === 0) {
-            return response.notFound(res, MESSAGES.PRODUCT.NOT_FOUND);
+            return responseHandler.notFound(res, MESSAGES.PRODUCT.NOT_FOUND);
         }
 
-        return response.success(res, null, MESSAGES.PRODUCT.DELETED);
+        return responseHandler.success(res, null, MESSAGES.PRODUCT.DELETED);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 

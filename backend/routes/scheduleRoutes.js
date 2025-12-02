@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { scheduleService } = require('../services');
-const response = require('../utils/responseHandler');
+const { responseHandler } = require('../utils/responseHandler');
 const { MESSAGES } = require('../utils/constants');
 
 /**
@@ -11,9 +11,9 @@ const { MESSAGES } = require('../utils/constants');
 router.get('/api/schedules', async (req, res) => {
     try {
         const schedules = await scheduleService.findAll();
-        return response.success(res, schedules);
+        return responseHandler.success(res, schedules);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -25,9 +25,9 @@ router.get('/api/schedules/order/:direction', async (req, res) => {
     try {
         const order = req.params.direction === 'desc' ? 'DESC' : 'ASC';
         const schedules = await scheduleService.findAllSorted(order);
-        return response.success(res, schedules);
+        return responseHandler.success(res, schedules);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -38,9 +38,13 @@ router.get('/api/schedules/order/:direction', async (req, res) => {
 router.post('/api/schedules', async (req, res) => {
     try {
         const schedule = await scheduleService.create(req.body);
-        return response.created(res, schedule, MESSAGES.SCHEDULE.CREATED);
+        return responseHandler.created(
+            res,
+            schedule,
+            MESSAGES.SCHEDULE.CREATED
+        );
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -56,12 +60,12 @@ router.put('/api/schedules/:id', async (req, res) => {
         );
 
         if (updatedCount === 0) {
-            return response.notFound(res, MESSAGES.SCHEDULE.NOT_FOUND);
+            return responseHandler.notFound(res, MESSAGES.SCHEDULE.NOT_FOUND);
         }
 
-        return response.success(res, null, MESSAGES.SCHEDULE.UPDATED);
+        return responseHandler.success(res, null, MESSAGES.SCHEDULE.UPDATED);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
@@ -74,12 +78,12 @@ router.delete('/api/schedules/:id', async (req, res) => {
         const deletedCount = await scheduleService.delete(req.params.id);
 
         if (deletedCount === 0) {
-            return response.notFound(res, MESSAGES.SCHEDULE.NOT_FOUND);
+            return responseHandler.notFound(res, MESSAGES.SCHEDULE.NOT_FOUND);
         }
 
-        return response.success(res, null, MESSAGES.SCHEDULE.DELETED);
+        return responseHandler.success(res, null, MESSAGES.SCHEDULE.DELETED);
     } catch (err) {
-        return response.error(res, err);
+        return responseHandler.error(res, err);
     }
 });
 
