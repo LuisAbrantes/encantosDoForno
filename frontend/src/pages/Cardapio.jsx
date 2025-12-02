@@ -102,7 +102,7 @@ const Cardapio = () => {
             {/* Header */}
             <section className="bg-linear-to-r from-orange-800 to-red-900 text-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h1 className="font-pacifico text-6xl md:text-7xl mb-4 text-readable-dark">
+                    <h1 className="font-pacifico text-6xl md:text-7xl mb-4">
                         Nosso Cardápio
                     </h1>
                     <p className="font-dancing text-2xl text-amber-100">
@@ -169,28 +169,30 @@ const Cardapio = () => {
             </section>
 
             {/* Call to Action */}
-            <section className="py-16 bg-white">
+            <section className="py-16 bg-linear-to-r from-orange-100 to-amber-100">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 className="font-dancing text-4xl text-orange-900 mb-6">
                         Gostou do que viu?
                     </h2>
-                    <p className="font-sans text-lg text-gray-600 mb-8">
-                        Faça sua reserva ou peça para viagem!
+                    <p className="font-sans text-lg text-gray-700 mb-8">
+                        Faça seu pedido pelo WhatsApp ou visite nossa loja!
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a
-                            href="/agendamento"
-                            className="font-vibes text-2xl bg-orange-700 hover:bg-orange-800 text-white py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
-                        >
-                            Fazer Reserva 📅
-                        </a>
                         <a
                             href="https://wa.me/5512396100000"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-vibes text-2xl bg-green-600 hover:bg-green-700 text-white py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
+                            className="font-vibes text-2xl bg-green-600 hover:bg-green-700 text-white py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg inline-flex items-center justify-center space-x-2"
                         >
-                            Pedir pelo WhatsApp 💬
+                            <span>�</span>
+                            <span>Pedir pelo WhatsApp</span>
+                        </a>
+                        <a
+                            href="/agendamento"
+                            className="font-vibes text-2xl bg-orange-700 hover:bg-orange-800 text-white py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg inline-flex items-center justify-center space-x-2"
+                        >
+                            <span>📅</span>
+                            <span>Fazer Agendamento</span>
                         </a>
                     </div>
                 </div>
