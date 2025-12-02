@@ -1,9 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import HeroSection from '../components/HeroSection';
 import { RESTAURANT_CONFIG, SOCIAL_MEDIA, IMAGES } from '../config/constants';
+import { productService } from '../services/api';
 
 const LandingPage = () => {
+    const [featuredProducts, setFeaturedProducts] = useState([]);
+    const [loadingFeatured, setLoadingFeatured] = useState(true);
+
+    useEffect(() => {
+        const fetchFeaturedProducts = async () => {
+            try {
+                const response = await productService.getFeatured(6);
+                setFeaturedProducts(response.data || []);
+            } catch (error) {
+                console.error('Erro ao carregar produtos em destaque:', error);
+            } finally {
+                setLoadingFeatured(false);
+            }
+        };
+        fetchFeaturedProducts();
+    }, []);
+
+    const formatPrice = price => {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(price);
+    };
+
     return (
         <div className="min-h-screen">
             <HeroSection />
@@ -169,153 +194,49 @@ const LandingPage = () => {
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {/* Prato 1 */}
-                        <div className="bg-white rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                            <div className="h-48 bg-linear-to-br from-red-400 to-orange-500 flex items-center justify-center">
-                                <div className="text-7xl">🍕</div>
-                            </div>
-                            <div className="p-6">
-                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
-                                    Pizza Artesanal
-                                </h3>
-                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
-                                    Massa fermentada por 48h, assada em forno a
-                                    lenha com ingredientes frescos e
-                                    selecionados.
-                                </p>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-2xl font-bold text-amber-700">
-                                        R$ 45,00
-                                    </span>
-                                    <span className="text-sm text-gray-500">
-                                        🔥 Especialidade
-                                    </span>
-                                </div>
-                            </div>
+                    {loadingFeatured ? (
+                        <div className="flex items-center justify-center h-64">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-orange-600"></div>
                         </div>
-
-                        {/* Prato 2 */}
-                        <div className="bg-white rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                            <div className="h-48 bg-linear-to-br from-orange-400 to-amber-500 flex items-center justify-center">
-                                <div className="text-7xl">🥖</div>
-                            </div>
-                            <div className="p-6">
-                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
-                                    Pão de Fermentação Natural
-                                </h3>
-                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
-                                    Pães artesanais feitos com fermentação
-                                    lenta, crocantes por fora e macios por
-                                    dentro.
-                                </p>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-2xl font-bold text-amber-700">
-                                        R$ 18,00
-                                    </span>
-                                    <span className="text-sm text-gray-500">
-                                        🌾 Tradicional
-                                    </span>
+                    ) : featuredProducts.length === 0 ? (
+                        <p className="text-center text-gray-500 py-12">
+                            Nenhum prato em destaque no momento
+                        </p>
+                    ) : (
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {featuredProducts.map(product => (
+                                <div
+                                    key={product.id}
+                                    className="bg-white rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                                >
+                                    <div className="h-48 bg-linear-to-br from-orange-400 to-amber-500 flex items-center justify-center">
+                                        <div className="text-7xl">
+                                            {product.Product_Image || '🍽️'}
+                                        </div>
+                                    </div>
+                                    <div className="p-6">
+                                        <h3 className="font-dancing text-3xl text-orange-900 mb-2">
+                                            {product.Product_Name}
+                                        </h3>
+                                        <p className="font-sans text-gray-600 mb-4 leading-relaxed">
+                                            {product.Product_Description ||
+                                                'Delicioso prato preparado com carinho.'}
+                                        </p>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-2xl font-bold text-amber-700">
+                                                {formatPrice(
+                                                    product.Product_Price
+                                                )}
+                                            </span>
+                                            <span className="text-sm text-gray-500">
+                                                ⭐ Destaque
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
-
-                        {/* Prato 3 */}
-                        <div className="bg-white rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                            <div className="h-48 bg-linear-to-br from-amber-400 to-yellow-500 flex items-center justify-center">
-                                <div className="text-7xl">🍰</div>
-                            </div>
-                            <div className="p-6">
-                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
-                                    Torta da Casa
-                                </h3>
-                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
-                                    Torta artesanal com recheios variados, feita
-                                    diariamente com ingredientes premium.
-                                </p>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-2xl font-bold text-amber-700">
-                                        R$ 28,00
-                                    </span>
-                                    <span className="text-sm text-gray-500">
-                                        ⭐ Favorita
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Prato 4 */}
-                        <div className="bg-white rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                            <div className="h-48 bg-linear-to-br from-red-500 to-pink-500 flex items-center justify-center">
-                                <div className="text-7xl">🍝</div>
-                            </div>
-                            <div className="p-6">
-                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
-                                    Massa Fresca
-                                </h3>
-                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
-                                    Massas preparadas na casa, com molhos
-                                    caseiros e ingredientes da região.
-                                </p>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-2xl font-bold text-amber-700">
-                                        R$ 38,00
-                                    </span>
-                                    <span className="text-sm text-gray-500">
-                                        🍝 Artesanal
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Prato 5 */}
-                        <div className="bg-white rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                            <div className="h-48 bg-linear-to-br from-orange-500 to-red-600 flex items-center justify-center">
-                                <div className="text-7xl">🥩</div>
-                            </div>
-                            <div className="p-6">
-                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
-                                    Carne Assada
-                                </h3>
-                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
-                                    Carnes nobres preparadas no forno a lenha,
-                                    macias e suculentas.
-                                </p>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-2xl font-bold text-amber-700">
-                                        R$ 52,00
-                                    </span>
-                                    <span className="text-sm text-gray-500">
-                                        🥩 Premium
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Prato 6 */}
-                        <div className="bg-white rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                            <div className="h-48 bg-linear-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-                                <div className="text-7xl">☕</div>
-                            </div>
-                            <div className="p-6">
-                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
-                                    Café Especial
-                                </h3>
-                                <p className="font-sans text-gray-600 mb-4 leading-relaxed">
-                                    Cafés especiais da região, torrados e moídos
-                                    na hora para máximo frescor.
-                                </p>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-2xl font-bold text-amber-700">
-                                        R$ 12,00
-                                    </span>
-                                    <span className="text-sm text-gray-500">
-                                        ☕ Local
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    )}
 
                     <div className="text-center mt-12">
                         <Link
