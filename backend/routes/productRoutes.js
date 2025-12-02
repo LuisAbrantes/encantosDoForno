@@ -5,6 +5,20 @@ const { responseHandler } = require('../utils/responseHandler');
 const { MESSAGES } = require('../utils/constants');
 
 /**
+ * @route   GET /api/products/featured
+ * @desc    Retorna produtos em destaque para a Landing Page
+ */
+router.get('/api/products/featured', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 6;
+        const products = await productService.findFeatured(limit);
+        return responseHandler.success(res, products, 'Produtos em destaque');
+    } catch (err) {
+        return responseHandler.error(res, err);
+    }
+});
+
+/**
  * @route   GET /api/products
  * @desc    Retorna todos os produtos
  */

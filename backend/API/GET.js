@@ -2,6 +2,9 @@
 const express = require('express');
 const router = express.Router();
 
+//? UTILS
+const { responseHandler } = require('../utils/responseHandler');
+
 //? TABLES REQUIREMENT
 const Employees = require('../Data/Tables/Employees');
 const Products = require('../Data/Tables/Products');
@@ -159,10 +162,9 @@ router.get('/api/products/featured', async (req, res) => {
             limit,
             include: [{ model: ProductClasses, as: 'Class' }]
         });
-        res.json(featuredProducts);
-    } catch (ERR) {
-        console.error(ERR);
-        res.status(500).json({ error: 'Erro ao buscar produtos em destaque' });
+        responseHandler.success(res, featuredProducts, 'Produtos em destaque');
+    } catch (error) {
+        responseHandler.error(res, error);
     }
 });
 

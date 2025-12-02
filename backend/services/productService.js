@@ -16,7 +16,9 @@ class ProductService extends BaseService {
             Product_Description: data.Product_Description || null,
             Product_Price: data.Product_Price,
             Product_Weight: data.Product_Weight || null,
-            productClassId: Number(data.Product_Class || data.productClassId)
+            Product_Image: data.Product_Image || null,
+            productClassId: Number(data.Product_Class || data.productClassId),
+            is_featured: Boolean(data.is_featured)
         };
     }
 
@@ -53,6 +55,18 @@ class ProductService extends BaseService {
         }
 
         return await this.findAll(options);
+    }
+
+    /**
+     * Retorna produtos em destaque
+     * @param {number} limit - Quantidade máxima de produtos
+     */
+    async findFeatured(limit = 6) {
+        return await this.model.findAll({
+            where: { is_featured: true },
+            limit,
+            include: [{ model: ProductClass, as: 'Class' }]
+        });
     }
 }
 
