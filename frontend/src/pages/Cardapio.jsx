@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { productService, productClassService } from '../services/api';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../hooks/useCart';
 import CartButton from '../components/CartButton';
 import CartDrawer from '../components/CartDrawer';
 

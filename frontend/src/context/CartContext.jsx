@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 
 const CartContext = createContext(null);
 
@@ -158,17 +158,6 @@ export const CartProvider = ({ children }) => {
     return (
         <CartContext.Provider value={value}>{children}</CartContext.Provider>
     );
-};
-
-/**
- * Hook para usar o carrinho
- */
-export const useCart = () => {
-    const context = useContext(CartContext);
-    if (!context) {
-        throw new Error('useCart deve ser usado dentro de um CartProvider');
-    }
-    return context;
 };
 
 export default CartContext;
