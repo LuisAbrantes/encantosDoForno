@@ -5,6 +5,29 @@ const { authenticate, requireAdmin } = require('../middleware/auth');
 const { responseHandler } = require('../utils/responseHandler');
 
 // ============================================================
+// ROTAS PÚBLICAS (PARA CLIENTES PRESENCIAIS)
+// ============================================================
+
+/**
+ * GET /api/tables/available-for-order
+ * Lista mesas disponíveis para o cliente selecionar ao fazer pedido
+ */
+router.get('/api/tables/available-for-order', async (req, res) => {
+    try {
+        const tables = await tableService.listTables({ status: 'available' });
+        const publicTables = tables.map(table => ({
+            id: table.id,
+            table_number: table.table_number,
+            location: table.location,
+            capacity: table.capacity
+        }));
+        responseHandler.success(res, publicTables, 'Mesas disponíveis');
+    } catch (error) {
+        responseHandler.error(res, error.message);
+    }
+});
+
+// ============================================================
 // ROTAS DE MESAS (TODAS PROTEGIDAS)
 // ============================================================
 

@@ -11,6 +11,7 @@ const authRoutes = require('./authRoutes');
 const queueRoutes = require('./queueRoutes');
 const tableRoutes = require('./tableRoutes');
 const tableLocationRoutes = require('./tableLocationRoutes');
+const orderRoutes = require('./orderRoutes');
 
 module.exports = {
     productRoutes,
@@ -20,5 +21,6 @@ module.exports = {
     authRoutes,
     queueRoutes,
     tableRoutes,
-    tableLocationRoutes
+    tableLocationRoutes,
+    orderRoutes
 };

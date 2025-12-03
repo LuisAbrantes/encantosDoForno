@@ -10,6 +10,7 @@ const productClassService = require('./productClassService');
 const queueService = require('./queueService');
 const tableService = require('./tableService');
 const tableLocationService = require('./tableLocationService');
+const orderService = require('./orderService');
 
 module.exports = {
     productService,
@@ -18,5 +19,6 @@ module.exports = {
     productClassService,
     queueService,
     tableService,
-    tableLocationService
+    tableLocationService,
+    orderService
 };

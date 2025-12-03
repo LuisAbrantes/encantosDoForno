@@ -9,6 +9,7 @@ const AdminLayout = () => {
     // Menu items - Funcionários só aparece para admins
     const menuItems = [
         { path: '/admin', label: 'Dashboard', icon: '📊', end: true },
+        { path: '/admin/orders', label: 'Pedidos', icon: '🍽️' },
         { path: '/admin/products', label: 'Produtos', icon: '🍕' },
         { path: '/admin/classes', label: 'Categorias', icon: '📁' },
         { path: '/admin/schedules', label: 'Agendamentos', icon: '📅' },
