@@ -1,15 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { productService, productClassService } from '../services/api';
+import { useCart } from '../context/CartContext';
+import CartButton from '../components/CartButton';
+import CartDrawer from '../components/CartDrawer';
 
 const Cardapio = () => {
     const [products, setProducts] = useState([]);
     const [classes, setClasses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { addItem } = useCart();
+
+    // Estado para feedback visual ao adicionar
+    const [addedProduct, setAddedProduct] = useState(null);
 
     useEffect(() => {
         fetchData();
     }, []);
+
+    // Handler para adicionar produto ao carrinho
+    const handleAddToCart = product => {
+        addItem(product);
+        setAddedProduct(product.id);
+        setTimeout(() => setAddedProduct(null), 1000);
+    };
 
     const fetchData = async () => {
         try {
@@ -99,6 +113,10 @@ const Cardapio = () => {
 
     return (
         <div className="min-h-screen bg-amber-50">
+            {/* Componentes do Carrinho */}
+            <CartButton />
+            <CartDrawer />
+
             {/* Header */}
             <section className="bg-linear-to-r from-orange-800 to-red-900 text-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -109,6 +127,11 @@ const Cardapio = () => {
                         Descubra os sabores artesanais que preparamos com
                         carinho
                     </p>
+                    {/* Aviso presencial */}
+                    <div className="mt-6 inline-flex items-center gap-2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-sm font-medium">
+                        <span>🏠</span>
+                        <span>Está no restaurante? Peça direto pelo site!</span>
+                    </div>
                 </div>
             </section>
 
@@ -141,9 +164,15 @@ const Cardapio = () => {
                                             className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                                         >
                                             <div className="flex justify-between items-start mb-3">
-                                                <h3 className="font-dancing text-2xl text-orange-900">
-                                                    {item.Product_Name}
-                                                </h3>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-2xl">
+                                                        {item.Product_Image ||
+                                                            '🍽️'}
+                                                    </span>
+                                                    <h3 className="font-dancing text-2xl text-orange-900">
+                                                        {item.Product_Name}
+                                                    </h3>
+                                                </div>
                                                 <span className="text-xl font-bold text-amber-700">
                                                     {formatPrice(
                                                         item.Product_Price
@@ -159,6 +188,25 @@ const Cardapio = () => {
                                                     {item.Product_Weight}
                                                 </p>
                                             )}
+                                            {/* Botão Adicionar */}
+                                            <button
+                                                onClick={() =>
+                                                    handleAddToCart(item)
+                                                }
+                                                className={`mt-4 w-full py-2 px-4 rounded-lg font-medium transition-all duration-300 ${
+                                                    addedProduct === item.id
+                                                        ? 'bg-green-500 text-white scale-95'
+                                                        : 'bg-orange-100 text-orange-700 hover:bg-orange-200 hover:scale-102'
+                                                }`}
+                                            >
+                                                {addedProduct === item.id ? (
+                                                    <span>✓ Adicionado!</span>
+                                                ) : (
+                                                    <span>
+                                                        + Adicionar ao pedido
+                                                    </span>
+                                                )}
+                                            </button>
                                         </div>
                                     ))}
                                 </div>

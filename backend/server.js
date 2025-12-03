@@ -12,7 +12,8 @@ const {
     authRoutes,
     queueRoutes,
     tableRoutes,
-    tableLocationRoutes
+    tableLocationRoutes,
+    orderRoutes
 } = require('./routes');
 
 // Importação dos middlewares
@@ -48,6 +49,8 @@ const initializeDatabase = async () => {
         require('./Data/Tables/QueueSettings');
         require('./Data/Tables/TableLocations');
         require('./Data/Tables/QueueDailyStats');
+        require('./Data/Tables/Order');
+        require('./Data/Tables/OrderItem');
 
         // Configura associações entre modelos
         const setupAssociations = require('./Data/associations');
@@ -119,6 +122,7 @@ const configureRoutes = () => {
     app.use(queueRoutes);
     app.use(tableRoutes);
     app.use(tableLocationRoutes);
+    app.use(orderRoutes);
 
     // Rotas legadas (mantidas para compatibilidade)
     app.use(GET);

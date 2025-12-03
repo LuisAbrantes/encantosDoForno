@@ -45,6 +45,16 @@ const MESSAGES = Object.freeze({
         RELEASED: 'Mesa liberada',
         CANNOT_DELETE_OCCUPIED: 'Não é possível remover uma mesa ocupada'
     }),
+    ORDER: Object.freeze({
+        NOT_FOUND: 'Pedido não encontrado',
+        CREATED: 'Pedido enviado com sucesso!',
+        UPDATED: 'Pedido atualizado',
+        CANCELLED: 'Pedido cancelado',
+        STATUS_UPDATED: 'Status atualizado',
+        TABLE_REQUIRED: 'Selecione uma mesa',
+        EMPTY_CART: 'Adicione itens ao pedido',
+        TABLE_NOT_OCCUPIED: 'Mesa não está ocupada'
+    }),
     SERVER: Object.freeze({
         INTERNAL_ERROR: 'Erro interno do servidor'
     })
