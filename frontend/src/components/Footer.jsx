@@ -18,7 +18,7 @@ const Footer = () => {
                         <div className="space-y-2 font-sans text-amber-100">
                             <p className="flex items-center space-x-2">
                                 <span>📞</span>
-                                <span>(12) 3961-XXXX</span>
+                                <span>(12) 99261-1931</span>
                             </p>
                             <p className="flex items-center space-x-2">
                                 <span>📧</span>
@@ -159,7 +159,6 @@ const Footer = () => {
                         &copy; 2025 Encantos do Forno - Jacareí/SP. Todos os
                         direitos reservados.
                     </p>
-                    <p className="mt-2 text-sm">Feito com ❤️ e muito 🔥</p>
                 </div>
             </div>
         </footer>
