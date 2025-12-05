@@ -110,10 +110,11 @@ const formatPrice = price => {
 /**
  * Card de pedido
  */
-const OrderCard = ({ order, onUpdateStatus }) => {
+const OrderCard = ({ order, onUpdateStatus, onDelete }) => {
     const statusConfig = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
     const createdAt = new Date(order.createdAt);
     const elapsedMinutes = Math.floor((Date.now() - createdAt) / 60000);
+    const canDelete = ['delivered', 'cancelled'].includes(order.status);
 
     return (
         <div
@@ -222,6 +223,18 @@ const OrderCard = ({ order, onUpdateStatus }) => {
                     })}
                 </div>
             )}
+
+            {/* Delete button for completed orders */}
+            {canDelete && onDelete && (
+                <div className="p-4 bg-gray-50 border-t">
+                    <button
+                        onClick={() => onDelete(order.id)}
+                        className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 text-sm"
+                    >
+                        🗑️ Excluir pedido
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
@@ -245,9 +258,10 @@ const OrdersAdmin = () => {
 
     const fetchOrders = useCallback(async () => {
         try {
+            // Usa /orders/active para ativos, /orders para todos
             const endpoint =
                 filter === 'all'
-                    ? `${API_BASE}/orders/active?includeCompleted=true`
+                    ? `${API_BASE}/orders`
                     : `${API_BASE}/orders/active`;
 
             const response = await fetch(endpoint, {
@@ -337,6 +351,38 @@ const OrdersAdmin = () => {
         } catch (err) {
             console.error('Erro ao atualizar status:', err);
             alert('Erro ao atualizar pedido');
+        }
+    };
+
+    const handleDeleteOrder = async orderId => {
+        if (
+            !confirm(
+                'Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.'
+            )
+        ) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/orders/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                setOrders(prev => prev.filter(o => o.id !== orderId));
+                fetchStats();
+            } else {
+                alert(result.error || 'Erro ao excluir pedido');
+            }
+        } catch (err) {
+            console.error('Erro ao excluir pedido:', err);
+            alert('Erro ao excluir pedido');
         }
     };
 
@@ -496,6 +542,7 @@ const OrdersAdmin = () => {
                             key={order.id}
                             order={order}
                             onUpdateStatus={handleUpdateStatus}
+                            onDelete={handleDeleteOrder}
                         />
                     ))}
                 </div>

@@ -155,4 +155,22 @@ router.put('/api/orders/:id/cancel', authenticate, async (req, res) => {
     }
 });
 
+/**
+ * DELETE /api/orders/:id
+ * Deleta pedido e seus itens (admin only)
+ */
+router.delete('/api/orders/:id', authenticate, async (req, res) => {
+    try {
+        const deleted = await orderService.deleteOrder(parseInt(req.params.id));
+
+        if (deleted === 0) {
+            return responseHandler.notFound(res, 'Pedido não encontrado');
+        }
+
+        responseHandler.success(res, null, 'Pedido excluído com sucesso');
+    } catch (error) {
+        responseHandler.error(res, error);
+    }
+});
+
 module.exports = router;

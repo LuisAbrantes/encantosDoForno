@@ -308,6 +308,34 @@ class OrderService {
 
         return stats;
     }
+
+    /**
+     * Deleta um pedido e seus itens (CASCADE)
+     * Usado para limpar dados de teste ou pedidos antigos
+     */
+    async deleteOrder(orderId) {
+        const transaction = await sequelize.transaction();
+
+        try {
+            // Deleta itens primeiro
+            await OrderItem.destroy({
+                where: { order_id: orderId },
+                transaction
+            });
+
+            // Deleta pedido
+            const deleted = await Order.destroy({
+                where: { id: orderId },
+                transaction
+            });
+
+            await transaction.commit();
+            return deleted;
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
+    }
 }
 
 module.exports = Object.freeze(new OrderService());
