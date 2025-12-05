@@ -315,5 +315,11 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error(chalk.bgRed.white(' ❌ Unhandled Rejection: '), reason);
 });
 
+// Log inicial para debug no Railway
+console.log(chalk.blue('🔄 Iniciando servidor...'));
+
 // Iniciar aplicação
-startServer();
+startServer().catch(err => {
+    console.error(chalk.bgRed.white(' ❌ Erro ao iniciar servidor: '), err);
+    process.exit(1);
+});
