@@ -4,7 +4,8 @@ const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
-    logging: false
+    logging: false,
+    rejectUnauthorized: false // Importante para conexão externa
 });
 
 module.exports = sequelize;
