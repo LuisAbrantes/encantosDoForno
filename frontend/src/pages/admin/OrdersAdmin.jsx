@@ -72,12 +72,12 @@ const ACTION_LABELS = {
  * Card de métricas
  */
 const MetricCard = ({ icon, value, label, color = 'text-orange-900' }) => (
-    <div className="bg-white rounded-lg shadow p-3 sm:p-4">
-        <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-xl sm:text-2xl">{icon}</span>
-            <div className="min-w-0">
-                <div className={`text-lg sm:text-2xl font-bold ${color} truncate`}>{value}</div>
-                <div className="text-xs sm:text-sm text-gray-500 truncate">{label}</div>
+    <div className="bg-white rounded-lg shadow p-4">
+        <div className="flex items-center gap-3">
+            <span className="text-2xl">{icon}</span>
+            <div>
+                <div className={`text-2xl font-bold ${color}`}>{value}</div>
+                <div className="text-sm text-gray-500">{label}</div>
             </div>
         </div>
     </div>
@@ -90,9 +90,9 @@ const StatusBadge = ({ status }) => {
     const config = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
     return (
         <span
-            className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border ${config.color}`}
+            className={`px-3 py-1 rounded-full text-sm font-medium border ${config.color}`}
         >
-            {config.icon} <span className="hidden sm:inline">{config.label}</span>
+            {config.icon} {config.label}
         </span>
     );
 };
@@ -123,25 +123,25 @@ const OrderCard = ({ order, onUpdateStatus }) => {
             )} overflow-hidden`}
         >
             {/* Header */}
-            <div className="p-3 sm:p-4 border-b bg-gray-50">
-                <div className="flex justify-between items-start gap-2">
-                    <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xl sm:text-2xl font-bold text-gray-900">
+            <div className="p-4 border-b bg-gray-50">
+                <div className="flex justify-between items-start">
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-2xl font-bold text-gray-900">
                                 Mesa {order.table?.table_number || '?'}
                             </span>
                             {order.table?.location && (
-                                <span className="text-xs sm:text-sm text-gray-500">
+                                <span className="text-sm text-gray-500">
                                     ({order.table.location})
                                 </span>
                             )}
                         </div>
                         {order.customer_name && (
-                            <p className="text-sm sm:text-base font-medium text-orange-700 mt-1 truncate">
+                            <p className="text-base font-medium text-orange-700 mt-1">
                                 👤 {order.customer_name}
                             </p>
                         )}
-                        <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-gray-500 mt-1">
                             Pedido #{order.id} •{' '}
                             {createdAt.toLocaleTimeString('pt-BR', {
                                 hour: '2-digit',
@@ -149,10 +149,10 @@ const OrderCard = ({ order, onUpdateStatus }) => {
                             })}
                         </p>
                     </div>
-                    <div className="text-right shrink-0">
+                    <div className="text-right">
                         <StatusBadge status={order.status} />
                         <p
-                            className={`text-xs sm:text-sm mt-1 ${
+                            className={`text-sm mt-1 ${
                                 elapsedMinutes > 30
                                     ? 'text-red-600 font-bold'
                                     : 'text-gray-500'
@@ -165,26 +165,26 @@ const OrderCard = ({ order, onUpdateStatus }) => {
             </div>
 
             {/* Items */}
-            <div className="p-3 sm:p-4">
+            <div className="p-4">
                 <ul className="space-y-2">
                     {order.items?.map((item, idx) => (
                         <li
                             key={idx}
-                            className="flex justify-between items-center gap-2"
+                            className="flex justify-between items-center"
                         >
-                            <div className="flex items-center gap-2 min-w-0 flex-1">
-                                <span className="text-base sm:text-lg shrink-0">
+                            <div className="flex items-center gap-2">
+                                <span className="text-lg">
                                     {item.product?.Product_Image || '🍽️'}
                                 </span>
-                                <span className="font-medium shrink-0">
+                                <span className="font-medium">
                                     {item.quantity}x
                                 </span>
-                                <span className="text-gray-800 truncate text-sm sm:text-base">
+                                <span className="text-gray-800">
                                     {item.product?.Product_Name ||
                                         'Produto não encontrado'}
                                 </span>
                             </div>
-                            <span className="text-gray-600 text-sm sm:text-base shrink-0">
+                            <span className="text-gray-600">
                                 {formatPrice(item.unit_price * item.quantity)}
                             </span>
                         </li>
@@ -192,14 +192,14 @@ const OrderCard = ({ order, onUpdateStatus }) => {
                 </ul>
 
                 {order.notes && (
-                    <div className="mt-3 p-2 bg-yellow-50 rounded text-xs sm:text-sm text-yellow-800">
+                    <div className="mt-3 p-2 bg-yellow-50 rounded text-sm text-yellow-800">
                         📝 {order.notes}
                     </div>
                 )}
 
                 <div className="mt-4 pt-3 border-t flex justify-between items-center">
-                    <span className="font-semibold text-gray-700 text-sm sm:text-base">Total:</span>
-                    <span className="text-lg sm:text-xl font-bold text-orange-600">
+                    <span className="font-semibold text-gray-700">Total:</span>
+                    <span className="text-xl font-bold text-orange-600">
                         {formatPrice(order.total)}
                     </span>
                 </div>
@@ -207,14 +207,14 @@ const OrderCard = ({ order, onUpdateStatus }) => {
 
             {/* Actions */}
             {statusConfig.actions.length > 0 && (
-                <div className="p-3 sm:p-4 bg-gray-50 border-t flex gap-2 flex-wrap">
+                <div className="p-4 bg-gray-50 border-t flex gap-2 flex-wrap">
                     {statusConfig.actions.map(action => {
                         const actionConfig = ACTION_LABELS[action];
                         return (
                             <button
                                 key={action}
                                 onClick={() => onUpdateStatus(order.id, action)}
-                                className={`px-3 sm:px-4 py-2 text-white rounded-lg font-medium transition-colors text-sm sm:text-base ${actionConfig.color}`}
+                                className={`px-4 py-2 text-white rounded-lg font-medium transition-colors ${actionConfig.color}`}
                             >
                                 {actionConfig.icon} {actionConfig.label}
                             </button>
@@ -376,27 +376,27 @@ const OrdersAdmin = () => {
     const readyCount = orders.filter(o => o.status === 'ready').length;
 
     return (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-6">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                    <h1 className="text-2xl font-bold text-gray-900">
                         🍽️ Pedidos
                     </h1>
-                    <p className="text-sm sm:text-base text-gray-500">
+                    <p className="text-gray-500">
                         Gerenciamento de pedidos do cardápio digital
                     </p>
                 </div>
                 <button
                     onClick={fetchAll}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 self-start sm:self-auto"
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
                 >
                     🔄 Atualizar
                 </button>
             </div>
 
             {/* Métricas */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 <MetricCard
                     icon="🕐"
                     value={pendingCount}
@@ -436,8 +436,8 @@ const OrdersAdmin = () => {
             </div>
 
             {/* Filtros */}
-            <div className="flex gap-2 flex-wrap items-center">
-                <span className="text-gray-500 text-sm sm:text-base">Filtrar:</span>
+            <div className="flex gap-2 flex-wrap">
+                <span className="text-gray-500 self-center">Filtrar:</span>
                 {[
                     { key: 'active', label: 'Ativos', icon: '📋' },
                     { key: 'pending', label: 'Pendentes', icon: '🕐' },
@@ -448,13 +448,13 @@ const OrdersAdmin = () => {
                     <button
                         key={f.key}
                         onClick={() => setFilter(f.key)}
-                        className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm flex items-center gap-1 ${
+                        className={`px-3 py-1 rounded-lg text-sm flex items-center gap-1 ${
                             filter === f.key
                                 ? 'bg-orange-600 text-white'
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                     >
-                        <span className="hidden sm:inline">{f.icon}</span> {f.label}
+                        {f.icon} {f.label}
                     </button>
                 ))}
             </div>
@@ -480,17 +480,17 @@ const OrdersAdmin = () => {
 
             {/* Grid de pedidos */}
             {orders.length === 0 ? (
-                <div className="bg-white rounded-lg shadow p-6 sm:p-8 text-center">
-                    <span className="text-5xl sm:text-6xl block mb-4">🎉</span>
-                    <p className="text-lg sm:text-xl text-gray-600">
+                <div className="bg-white rounded-lg shadow p-8 text-center">
+                    <span className="text-6xl block mb-4">🎉</span>
+                    <p className="text-xl text-gray-600">
                         Nenhum pedido no momento
                     </p>
-                    <p className="text-sm sm:text-base text-gray-400 mt-2">
+                    <p className="text-gray-400 mt-2">
                         Os pedidos feitos pelo cardápio digital aparecerão aqui
                     </p>
                 </div>
             ) : (
-                <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {orders.map(order => (
                         <OrderCard
                             key={order.id}
