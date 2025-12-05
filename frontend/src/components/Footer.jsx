@@ -4,8 +4,8 @@ import { SOCIAL_MEDIA, ADDRESS, RESTAURANT_CONFIG } from '../config/constants';
 const Footer = () => {
     return (
         <footer className="bg-linear-to-r from-orange-900 to-red-950 text-amber-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                     {/* Informações de Contato */}
                     <div>
                         <h3 className="font-dancing text-2xl mb-4 flex items-center space-x-2">

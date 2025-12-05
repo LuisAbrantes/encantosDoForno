@@ -50,26 +50,28 @@ const QueueStats = ({ queueInfo, loading }) => {
     }
 
     return (
-        <section className="py-8 bg-white shadow-lg">
+        <section className="py-6 sm:py-8 bg-white shadow-lg">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid md:grid-cols-3 gap-6 text-center">
-                    <div className="p-6 bg-amber-50 rounded-lg">
-                        <div className="text-4xl font-bold text-orange-900 mb-2">
+                <div className="grid grid-cols-3 gap-3 sm:gap-6 text-center">
+                    <div className="p-3 sm:p-6 bg-amber-50 rounded-lg">
+                        <div className="text-2xl sm:text-4xl font-bold text-orange-900 mb-1 sm:mb-2">
                             {queueInfo?.currentWaiting || 0}
                         </div>
-                        <div className="text-gray-600">Pessoas na fila</div>
+                        <div className="text-xs sm:text-base text-gray-600">
+                            Pessoas na fila
+                        </div>
                     </div>
-                    <div className="p-6 bg-amber-50 rounded-lg">
-                        <div className="text-4xl font-bold text-orange-900 mb-2">
+                    <div className="p-3 sm:p-6 bg-amber-50 rounded-lg">
+                        <div className="text-2xl sm:text-4xl font-bold text-orange-900 mb-1 sm:mb-2">
                             ~{queueInfo?.estimatedWaitMinutes || 0} min
                         </div>
-                        <div className="text-gray-600">
-                            Tempo médio de espera
+                        <div className="text-xs sm:text-base text-gray-600">
+                            Tempo de espera
                         </div>
                     </div>
-                    <div className="p-6 bg-amber-50 rounded-lg">
+                    <div className="p-3 sm:p-6 bg-amber-50 rounded-lg">
                         <div
-                            className={`text-4xl font-bold mb-2 ${
+                            className={`text-2xl sm:text-4xl font-bold mb-1 sm:mb-2 ${
                                 queueInfo?.isOpen
                                     ? 'text-green-600'
                                     : 'text-red-600'
@@ -77,7 +79,7 @@ const QueueStats = ({ queueInfo, loading }) => {
                         >
                             ●
                         </div>
-                        <div className="text-gray-600">
+                        <div className="text-xs sm:text-base text-gray-600">
                             {queueInfo?.isOpen ? 'Fila aberta' : 'Fila fechada'}
                         </div>
                     </div>
@@ -152,15 +154,15 @@ const QueueItem = ({ item, index, isCurrentUser }) => {
  * Lista de informações
  */
 const InfoBox = () => (
-    <div className="mt-6 p-6 bg-blue-50 rounded-lg border border-blue-200">
-        <h3 className="font-bold text-blue-900 mb-3 flex items-center">
-            <span className="text-2xl mr-2">💡</span>
+    <div className="mt-4 sm:mt-6 p-4 sm:p-6 bg-blue-50 rounded-lg border border-blue-200">
+        <h3 className="font-bold text-blue-900 mb-2 sm:mb-3 flex items-center text-sm sm:text-base">
+            <span className="text-xl sm:text-2xl mr-2">💡</span>
             Como funciona?
         </h3>
-        <ul className="space-y-2 text-gray-700 text-sm">
-            <li>• Entre na fila preenchendo o formulário ao lado</li>
-            <li>• Acompanhe sua posição em tempo real nesta página</li>
-            <li>• Quando estiver próximo, você será notificado via WhatsApp</li>
+        <ul className="space-y-1.5 sm:space-y-2 text-gray-700 text-xs sm:text-sm">
+            <li>• Entre na fila preenchendo o formulário</li>
+            <li>• Acompanhe sua posição em tempo real</li>
+            <li>• Você será notificado via WhatsApp</li>
             <li>• Quando for sua vez, seu nome aparecerá como "Chamando"</li>
             <li>• Dirija-se à recepção do restaurante</li>
         </ul>
@@ -179,9 +181,9 @@ const JoinQueueForm = ({
     canJoin,
     queueInfo
 }) => (
-    <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky top-24">
-        <h2 className="text-3xl font-bold text-orange-900 mb-6 flex items-center">
-            <span className="text-4xl mr-3">📝</span>
+    <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 md:p-8 lg:sticky lg:top-24">
+        <h2 className="text-2xl sm:text-3xl font-bold text-orange-900 mb-4 sm:mb-6 flex items-center">
+            <span className="text-3xl sm:text-4xl mr-2 sm:mr-3">📝</span>
             Entrar na Fila
         </h2>
 
@@ -308,13 +310,13 @@ const UserInQueueCard = ({
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky top-24">
+        <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 md:p-8 lg:sticky lg:top-24">
             <div className="text-center">
-                <div className="text-6xl mb-4">
+                <div className="text-5xl sm:text-6xl mb-3 sm:mb-4">
                     {userStatus?.status === 'called' ? '🔔' : '✅'}
                 </div>
                 <h2
-                    className={`text-3xl font-bold mb-4 ${
+                    className={`text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 ${
                         userStatus?.status === 'called'
                             ? 'text-green-700 animate-pulse'
                             : 'text-green-700'
@@ -666,12 +668,12 @@ const Fila = () => {
     return (
         <div className="min-h-screen bg-amber-50">
             {/* Header */}
-            <section className="bg-linear-to-r from-orange-800 to-red-900 text-white py-20">
+            <section className="bg-linear-to-r from-orange-800 to-red-900 text-white py-12 sm:py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h1 className="font-pacifico text-6xl md:text-7xl mb-4 text-readable-dark">
+                    <h1 className="font-pacifico text-4xl sm:text-6xl md:text-7xl mb-4 text-readable-dark">
                         Fila Virtual
                     </h1>
-                    <p className="font-dancing text-2xl text-amber-100">
+                    <p className="font-dancing text-xl sm:text-2xl text-amber-100">
                         Entre na fila e aguarde confortavelmente
                     </p>
                 </div>
@@ -689,13 +691,15 @@ const Fila = () => {
                 </div>
             )}
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-                <div className="grid lg:grid-cols-2 gap-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                     {/* Lado esquerdo - Informações */}
                     <div>
-                        <div className="bg-white rounded-lg shadow-xl p-6 md:p-8">
-                            <h2 className="text-3xl font-bold text-orange-900 mb-6 flex items-center">
-                                <span className="text-4xl mr-3">👥</span>
+                        <div className="bg-white rounded-lg shadow-xl p-4 sm:p-6 md:p-8">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-orange-900 mb-4 sm:mb-6 flex items-center">
+                                <span className="text-3xl sm:text-4xl mr-2 sm:mr-3">
+                                    👥
+                                </span>
                                 Fila Atual
                             </h2>
 

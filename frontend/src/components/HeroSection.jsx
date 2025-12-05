@@ -23,29 +23,29 @@ const HeroSection = () => {
 
             {/* Content */}
             <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl">
-                <h1 className="font-pacifico text-5xl md:text-7xl text-white mb-6 animate-fade-in text-readable-dark">
+                <h1 className="font-pacifico text-4xl sm:text-5xl md:text-7xl text-white mb-4 sm:mb-6 animate-fade-in text-readable-dark">
                     Bem-vindo ao{' '}
                     <span className="text-amber-400">
                         {RESTAURANT_CONFIG.name}
                     </span>
                 </h1>
-                <p className="font-dancing text-2xl md:text-3xl text-amber-100 mb-8 animate-slide-up">
+                <p className="font-dancing text-xl sm:text-2xl md:text-3xl text-amber-100 mb-6 sm:mb-8 animate-slide-up">
                     Um espaço acolhedor com comida artesanal de Jacareí
                 </p>
-                <p className="font-sans text-lg text-amber-50 mb-10 max-w-2xl mx-auto animate-slide-up delay-100 leading-relaxed">
+                <p className="font-sans text-base sm:text-lg text-amber-50 mb-8 sm:mb-10 max-w-2xl mx-auto animate-slide-up delay-100 leading-relaxed">
                     Saboreie pratos preparados com ingredientes frescos, muito
                     carinho e a tradição que aquece o coração.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up delay-200">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center animate-slide-up delay-200 px-4 sm:px-0">
                     <Link
                         to="/cardapio"
-                        className="font-vibes text-2xl bg-amber-600 hover:bg-amber-700 text-white py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-2xl"
+                        className="font-vibes text-xl sm:text-2xl bg-amber-600 hover:bg-amber-700 text-white py-3 sm:py-4 px-6 sm:px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-2xl"
                     >
                         Ver Cardápio 🍽️
                     </Link>
                     <Link
                         to="/agendamento"
-                        className="font-vibes text-2xl bg-orange-700 hover:bg-orange-800 text-white py-4 px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-2xl"
+                        className="font-vibes text-xl sm:text-2xl bg-orange-700 hover:bg-orange-800 text-white py-3 sm:py-4 px-6 sm:px-8 rounded-lg transition-all duration-300 hover:scale-105 shadow-2xl"
                     >
                         Faça sua Reserva 📅
                     </Link>
