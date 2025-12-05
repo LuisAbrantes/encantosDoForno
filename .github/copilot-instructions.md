@@ -130,22 +130,26 @@ npm run lint             # ESLint check
 ## 🚨 Regras de Deploy e Ambiente (Adicionado para Produção)
 
 1. **PROIBIDO Localhost Hardcoded:**
-   - Nunca sugira ou escreva `http://localhost:3000` diretamente em arquivos do Frontend (Contexts, Pages, Components).
-   - Sempre utilize a importação centralizada: `import { API_CONFIG } from '@/config/constants'` (ou caminho relativo).
+
+    - Nunca sugira ou escreva `http://localhost:3000` diretamente em arquivos do Frontend (Contexts, Pages, Components).
+    - Sempre utilize a importação centralizada: `import { API_CONFIG } from '@/config/constants'` (ou caminho relativo).
 
 2. **Configuração de `VITE_API_URL`:**
-   - **DEVE ser a URL do servidor SEM `/api` no final**
-   - Produção: `https://encantosdoforno-production.up.railway.app`
-   - Dev: `http://localhost:3000`
-   - O código em `constants.js` normaliza automaticamente (remove trailing `/api` se existir)
+
+    - **DEVE ser a URL do servidor SEM `/api` no final**
+    - Produção: `https://encantosdoforno-production.up.railway.app`
+    - Dev: `http://localhost:3000`
+    - O código em `constants.js` normaliza automaticamente (remove trailing `/api` se existir)
 
 3. **Padrão de Endpoints no Frontend:**
-   - `api.js` (apiRequest): Endpoints devem incluir `/api/...` (ex: `/api/products`)
-   - `queueService.js`: Usa `BASE_URL = API_CONFIG.BASE_URL + '/api'` internamente
-   - Fetch direto em componentes: Usar `${API_BASE}/api/...`
+
+    - `api.js` (apiRequest): Endpoints devem incluir `/api/...` (ex: `/api/products`)
+    - `queueService.js`: Usa `BASE_URL = API_CONFIG.BASE_URL + '/api'` internamente
+    - Fetch direto em componentes: Usar `${API_BASE}/api/...`
 
 4. **Configuração de CORS:**
-   - Ao criar ou alterar o `server.js`, garanta que o middleware CORS esteja configurado para permitir explicitamente os métodos `PUT` e `DELETE`, pois alguns navegadores/proxies bloqueiam essas requisições sem a configuração correta de `Access-Control-Allow-Methods`.
+
+    - Ao criar ou alterar o `server.js`, garanta que o middleware CORS esteja configurado para permitir explicitamente os métodos `PUT` e `DELETE`, pois alguns navegadores/proxies bloqueiam essas requisições sem a configuração correta de `Access-Control-Allow-Methods`.
 
 5. **Arquitetura de API:**
-   - O Frontend (Vercel) comunica-se com o Backend (Railway). Sempre assuma latência de rede e trate erros de conexão (ex: try/catch com feedback visual) em vez de apenas logar no console.
+    - O Frontend (Vercel) comunica-se com o Backend (Railway). Sempre assuma latência de rede e trate erros de conexão (ex: try/catch com feedback visual) em vez de apenas logar no console.

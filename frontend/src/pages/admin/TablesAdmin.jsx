@@ -510,12 +510,15 @@ const TablesAdmin = () => {
     const fetchTables = useCallback(async () => {
         try {
             const statusParam = filter !== 'all' ? `?status=${filter}` : '';
-            const response = await fetch(`${API_BASE}/api/tables${statusParam}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+            const response = await fetch(
+                `${API_BASE}/api/tables${statusParam}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
                 }
-            });
+            );
             const result = await response.json();
             if (result.success) {
                 setTables(result.data);
@@ -630,13 +633,16 @@ const TablesAdmin = () => {
 
     const handleReleaseTable = async id => {
         try {
-            const response = await fetch(`${API_BASE}/api/tables/${id}/release`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+            const response = await fetch(
+                `${API_BASE}/api/tables/${id}/release`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
                 }
-            });
+            );
 
             const result = await response.json();
             if (result.success) {
@@ -673,13 +679,16 @@ const TablesAdmin = () => {
 
     const handleSetAvailable = async id => {
         try {
-            const response = await fetch(`${API_BASE}/api/tables/${id}/available`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+            const response = await fetch(
+                `${API_BASE}/api/tables/${id}/available`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
                 }
-            });
+            );
 
             const result = await response.json();
             if (result.success) {
@@ -727,13 +736,16 @@ const TablesAdmin = () => {
             return;
 
         try {
-            const response = await fetch(`${API_BASE}/api/table-locations/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+            const response = await fetch(
+                `${API_BASE}/api/table-locations/${id}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
                 }
-            });
+            );
 
             const result = await response.json();
             if (result.success) {

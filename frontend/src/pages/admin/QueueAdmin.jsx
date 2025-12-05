@@ -553,14 +553,17 @@ const QueueAdmin = () => {
 
     const handleSeatCustomer = async (queueId, tableId) => {
         try {
-            const response = await fetch(`${API_BASE}/api/queue/${queueId}/seat`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ table_id: tableId })
-            });
+            const response = await fetch(
+                `${API_BASE}/api/queue/${queueId}/seat`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ table_id: tableId })
+                }
+            );
             const result = await response.json();
             if (result.success) {
                 fetchQueue();
@@ -576,13 +579,16 @@ const QueueAdmin = () => {
         if (!confirm('Confirma que o cliente não compareceu?')) return;
 
         try {
-            const response = await fetch(`${API_BASE}/api/queue/${id}/no-show`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+            const response = await fetch(
+                `${API_BASE}/api/queue/${id}/no-show`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
                 }
-            });
+            );
             const result = await response.json();
             if (result.success) {
                 fetchQueue();
@@ -650,13 +656,16 @@ const QueueAdmin = () => {
 
     const handleToggleQueue = async () => {
         try {
-            const response = await fetch(`${API_BASE}/api/queue/settings/toggle`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+            const response = await fetch(
+                `${API_BASE}/api/queue/settings/toggle`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
                 }
-            });
+            );
             const result = await response.json();
             if (result.success) {
                 setSettings(result.data);

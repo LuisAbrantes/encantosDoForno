@@ -19,11 +19,14 @@ export const AuthProvider = ({ children }) => {
             }
 
             try {
-                const response = await fetch(`${API_CONFIG.BASE_URL}/api/auth/me`, {
-                    headers: {
-                        Authorization: `Bearer ${storedToken}`
+                const response = await fetch(
+                    `${API_CONFIG.BASE_URL}/api/auth/me`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${storedToken}`
+                        }
                     }
-                });
+                );
 
                 if (response.ok) {
                     const data = await response.json();
@@ -50,13 +53,16 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
+            const response = await fetch(
+                `${API_CONFIG.BASE_URL}/api/auth/login`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                }
+            );
 
             const data = await response.json();
 

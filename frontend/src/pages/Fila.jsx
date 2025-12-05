@@ -467,7 +467,9 @@ const Fila = () => {
         if (!entryId) return;
 
         try {
-            const response = await fetch(`${API_BASE}/api/queue/status/${entryId}`);
+            const response = await fetch(
+                `${API_BASE}/api/queue/status/${entryId}`
+            );
             const result = await response.json();
 
             if (result.success && result.data) {
