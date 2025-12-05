@@ -126,7 +126,7 @@ const LandingPage = () => {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-3xl mx-auto">
                         {/* Chef e Proprietária */}
                         <div className="bg-amber-50 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 sm:hover:scale-105">
                             <div className="h-48 sm:h-64 bg-linear-to-br from-orange-400 to-red-500 flex items-center justify-center">
@@ -148,12 +148,12 @@ const LandingPage = () => {
                         </div>
 
                         {/* Chef e Proprietário */}
-                        <div className="bg-amber-50 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                            <div className="h-64 bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-                                <div className="text-8xl">👨‍🍳</div>
+                        <div className="bg-amber-50 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 sm:hover:scale-105">
+                            <div className="h-48 sm:h-64 bg-linear-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                                <div className="text-6xl sm:text-8xl">👨‍🍳</div>
                             </div>
-                            <div className="p-6">
-                                <h3 className="font-dancing text-3xl text-orange-900 mb-2">
+                            <div className="p-4 sm:p-6">
+                                <h3 className="font-dancing text-2xl sm:text-3xl text-orange-900 mb-2">
                                     Marcelo Oliveira
                                 </h3>
                                 <p className="font-sans text-amber-700 font-semibold mb-3">

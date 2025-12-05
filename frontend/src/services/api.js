@@ -2,14 +2,15 @@
  * Configuração da API para o Frontend
  * Centraliza a comunicação com o backend
  */
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { API_CONFIG } from '../config/constants';
 
 /**
  * Função genérica para fazer requisições à API
  */
 const apiRequest = async (endpoint, options = {}) => {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${API_CONFIG.BASE_URL}${
+        endpoint.startsWith('/api') ? endpoint.slice(4) : endpoint
+    }`;
 
     const defaultOptions = {
         headers: {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../hooks/useCart';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { API_CONFIG } from '../config/constants';
 
 /**
  * Drawer lateral do carrinho
@@ -41,7 +40,7 @@ const CartDrawer = () => {
         setLoading(true);
         try {
             const response = await fetch(
-                `${API_URL}/api/tables/available-for-order`
+                `${API_CONFIG.BASE_URL}/tables/available-for-order`
             );
             const data = await response.json();
             setTables(data.data || []);
@@ -72,7 +71,7 @@ const CartDrawer = () => {
         setError(null);
 
         try {
-            const response = await fetch(`${API_URL}/api/orders`, {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/orders`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(getOrderData())

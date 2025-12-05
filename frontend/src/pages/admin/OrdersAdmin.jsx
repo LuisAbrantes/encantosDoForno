@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { API_CONFIG } from '../../config/constants';
 
 // ============================================================
 // CONSTANTES
 // ============================================================
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = API_CONFIG.BASE_URL;
 const POLLING_INTERVAL = 5000; // 5 segundos
 
 const STATUS_CONFIG = {

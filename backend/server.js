@@ -72,8 +72,19 @@ const initializeDatabase = async () => {
  * Configuração de middlewares globais
  */
 const configureMiddlewares = () => {
-    // CORS para permitir requisições do frontend
-    app.use(cors());
+    // CORS configurado para produção (Vercel + Railway)
+    app.use(
+        cors({
+            origin: '*',
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+            allowedHeaders: [
+                'Content-Type',
+                'Authorization',
+                'X-Requested-With'
+            ],
+            credentials: true
+        })
+    );
 
     // Parsing de JSON e URL-encoded
     app.use(express.json({ limit: '10mb' }));

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { API_CONFIG } from '../../config/constants';
 
 // ============================================================
 // CONSTANTES
 // ============================================================
-const API_URL = 'http://localhost:3000';
+const API_URL = API_CONFIG.BASE_URL;
 
 const ROLES = {
     admin: { label: 'Administrador', color: 'bg-purple-100 text-purple-800' },

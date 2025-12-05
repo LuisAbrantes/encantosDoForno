@@ -126,3 +126,15 @@ npm run lint             # ESLint check
 -   English for code identifiers
 -   JSDoc comments on service methods
 -   Centralized exports via `index.js` files in `routes/`, `services/`, `middleware/`
+
+## 🚨 Regras de Deploy e Ambiente (Adicionado para Produção)
+
+1. **PROIBIDO Localhost Hardcoded:**
+   - Nunca sugira ou escreva `http://localhost:3000` diretamente em arquivos do Frontend (Contexts, Pages, Components).
+   - Sempre utilize a importação centralizada: `import { API_CONFIG } from '@/config/constants'` (ou caminho relativo).
+
+2. **Configuração de CORS:**
+   - Ao criar ou alterar o `server.js`, garanta que o middleware CORS esteja configurado para permitir explicitamente os métodos `PUT` e `DELETE`, pois alguns navegadores/proxies bloqueiam essas requisições sem a configuração correta de `Access-Control-Allow-Methods`.
+
+3. **Arquitetura de API:**
+   - O Frontend (Vercel) comunica-se com o Backend (Railway). Sempre assuma latência de rede e trate erros de conexão (ex: try/catch com feedback visual) em vez de apenas logar no console.
