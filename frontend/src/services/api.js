@@ -107,9 +107,26 @@ export const productClassService = {
     delete: id => apiRequest(`/api/classes/${id}`, { method: 'DELETE' })
 };
 
+/**
+ * Serviços de Pedidos
+ */
+export const orderService = {
+    getActive: () => apiRequest('/api/orders/active'),
+    getAll: () => apiRequest('/api/orders'),
+    getByTable: tableId => apiRequest(`/api/orders/table/${tableId}`),
+    getStats: () => apiRequest('/api/orders/stats'),
+    updateStatus: (id, status) =>
+        apiRequest(`/api/orders/${id}/status`, {
+            method: 'PUT',
+            body: JSON.stringify({ status })
+        }),
+    delete: id => apiRequest(`/api/orders/${id}`, { method: 'DELETE' })
+};
+
 export default {
     products: productService,
     schedules: scheduleService,
     employees: employeeService,
-    productClasses: productClassService
+    productClasses: productClassService,
+    orders: orderService
 };
