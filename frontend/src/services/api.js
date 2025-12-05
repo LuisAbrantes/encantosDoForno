@@ -22,7 +22,7 @@ const apiRequest = async (endpoint, options = {}) => {
     const data = await response.json();
 
     if (!response.ok) {
-        throw new Error(data.message || 'Erro na requisição');
+        throw new Error(data.error || data.message || 'Erro na requisição');
     }
 
     return data;
