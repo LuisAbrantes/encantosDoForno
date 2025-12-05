@@ -91,7 +91,7 @@ const ProductsAdmin = () => {
                 fetchData();
             } catch (error) {
                 console.error('Erro ao excluir produto:', error);
-                alert('Erro ao excluir produto');
+                alert(error.message || 'Erro ao excluir produto');
             }
         }
     };

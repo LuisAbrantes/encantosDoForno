@@ -1,6 +1,8 @@
 const BaseService = require('./baseService');
 const Product = require('../Data/Tables/Products');
 const ProductClass = require('../Data/Tables/ProductClass');
+const OrderItem = require('../Data/Tables/OrderItem');
+const { ApiError } = require('../utils/responseHandler');
 
 class ProductService extends BaseService {
     constructor() {
@@ -67,6 +69,34 @@ class ProductService extends BaseService {
             limit,
             include: [{ model: ProductClass, as: 'Class' }]
         });
+    }
+
+    /**
+     * Deleta produto verificando se não há pedidos vinculados
+     */
+    async delete(id) {
+        // Verifica se há OrderItems vinculados
+        const itemsCount = await OrderItem.count({
+            where: { product_id: id }
+        });
+
+        if (itemsCount > 0) {
+            throw ApiError.badRequest(
+                `Não é possível excluir: produto está em ${itemsCount} pedido(s)`
+            );
+        }
+
+        // Tenta excluir, captura erro de FK se houver
+        try {
+            return await super.delete(id);
+        } catch (err) {
+            if (err.name === 'SequelizeForeignKeyConstraintError') {
+                throw ApiError.badRequest(
+                    'Não é possível excluir: existem registros vinculados'
+                );
+            }
+            throw err;
+        }
     }
 }
 

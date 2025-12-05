@@ -39,6 +39,9 @@ const errorHandler = (err, req, res, next) => {
         statusCode = HTTP_STATUS.BAD_REQUEST;
     } else if (err.name === 'SequelizeUniqueConstraintError') {
         statusCode = HTTP_STATUS.CONFLICT;
+    } else if (err.name === 'SequelizeForeignKeyConstraintError') {
+        statusCode = HTTP_STATUS.CONFLICT;
+        err.message = 'Não é possível excluir: existem registros vinculados';
     } else if (err.name === 'JsonWebTokenError') {
         statusCode = HTTP_STATUS.UNAUTHORIZED;
     }
