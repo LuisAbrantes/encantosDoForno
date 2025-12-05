@@ -261,8 +261,8 @@ const OrdersAdmin = () => {
             // Usa /orders/active para ativos, /orders para todos
             const endpoint =
                 filter === 'all'
-                    ? `${API_BASE}/orders`
-                    : `${API_BASE}/orders/active`;
+                    ? `${API_BASE}/api/orders`
+                    : `${API_BASE}/api/orders/active`;
 
             const response = await fetch(endpoint, {
                 headers: {
@@ -289,7 +289,7 @@ const OrdersAdmin = () => {
 
     const fetchStats = useCallback(async () => {
         try {
-            const response = await fetch(`${API_BASE}/orders/stats`, {
+            const response = await fetch(`${API_BASE}/api/orders/stats`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
@@ -324,7 +324,7 @@ const OrdersAdmin = () => {
 
         try {
             const response = await fetch(
-                `${API_BASE}/orders/${orderId}/status`,
+                `${API_BASE}/api/orders/${orderId}/status`,
                 {
                     method: 'PUT',
                     headers: {
@@ -364,7 +364,7 @@ const OrdersAdmin = () => {
         }
 
         try {
-            const response = await fetch(`${API_BASE}/orders/${orderId}`, {
+            const response = await fetch(`${API_BASE}/api/orders/${orderId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

@@ -6,11 +6,11 @@ import { API_CONFIG } from '../config/constants';
 
 /**
  * Função genérica para fazer requisições à API
+ * @param {string} endpoint - Caminho do endpoint (ex: '/api/products')
+ * @param {object} options - Opções do fetch
  */
 const apiRequest = async (endpoint, options = {}) => {
-    const url = `${API_CONFIG.BASE_URL}${
-        endpoint.startsWith('/api') ? endpoint.slice(4) : endpoint
-    }`;
+    const url = `${API_CONFIG.BASE_URL}${endpoint}`;
 
     const defaultOptions = {
         headers: {

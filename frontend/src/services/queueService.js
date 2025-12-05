@@ -5,7 +5,8 @@
 
 import { API_CONFIG } from '../config/constants';
 
-const { BASE_URL } = API_CONFIG;
+// BASE_URL do servidor + /api para endpoints
+const BASE_URL = `${API_CONFIG.BASE_URL}/api`;
 
 /**
  * Helper para fazer fetch com tratamento de erro padrão

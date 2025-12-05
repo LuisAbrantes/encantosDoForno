@@ -430,7 +430,7 @@ const QueueAdmin = () => {
                     ? `&status=${filter}`
                     : '';
             const response = await fetch(
-                `${API_BASE}/queue?${statusFilter}${includeAll}`,
+                `${API_BASE}/api/queue?${statusFilter}${includeAll}`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -449,7 +449,7 @@ const QueueAdmin = () => {
 
     const fetchTables = useCallback(async () => {
         try {
-            const response = await fetch(`${API_BASE}/tables`, {
+            const response = await fetch(`${API_BASE}/api/tables`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
@@ -466,7 +466,7 @@ const QueueAdmin = () => {
 
     const fetchMetrics = useCallback(async () => {
         try {
-            const response = await fetch(`${API_BASE}/queue/metrics`, {
+            const response = await fetch(`${API_BASE}/api/queue/metrics`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
@@ -483,7 +483,7 @@ const QueueAdmin = () => {
 
     const fetchSettings = useCallback(async () => {
         try {
-            const response = await fetch(`${API_BASE}/queue/settings`, {
+            const response = await fetch(`${API_BASE}/api/queue/settings`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
@@ -515,7 +515,7 @@ const QueueAdmin = () => {
 
     const handleCallCustomer = async id => {
         try {
-            const response = await fetch(`${API_BASE}/queue/${id}/call`, {
+            const response = await fetch(`${API_BASE}/api/queue/${id}/call`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -534,7 +534,7 @@ const QueueAdmin = () => {
 
     const handleCallNext = async () => {
         try {
-            const response = await fetch(`${API_BASE}/queue/call-next`, {
+            const response = await fetch(`${API_BASE}/api/queue/call-next`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -553,7 +553,7 @@ const QueueAdmin = () => {
 
     const handleSeatCustomer = async (queueId, tableId) => {
         try {
-            const response = await fetch(`${API_BASE}/queue/${queueId}/seat`, {
+            const response = await fetch(`${API_BASE}/api/queue/${queueId}/seat`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -576,7 +576,7 @@ const QueueAdmin = () => {
         if (!confirm('Confirma que o cliente não compareceu?')) return;
 
         try {
-            const response = await fetch(`${API_BASE}/queue/${id}/no-show`, {
+            const response = await fetch(`${API_BASE}/api/queue/${id}/no-show`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -597,7 +597,7 @@ const QueueAdmin = () => {
         if (!confirm('Remover este cliente da fila?')) return;
 
         try {
-            const response = await fetch(`${API_BASE}/queue/${id}/admin`, {
+            const response = await fetch(`${API_BASE}/api/queue/${id}/admin`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -616,7 +616,7 @@ const QueueAdmin = () => {
 
     const handleAddCustomer = async formData => {
         try {
-            const response = await fetch(`${API_BASE}/queue/manual`, {
+            const response = await fetch(`${API_BASE}/api/queue/manual`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -650,7 +650,7 @@ const QueueAdmin = () => {
 
     const handleToggleQueue = async () => {
         try {
-            const response = await fetch(`${API_BASE}/queue/settings/toggle`, {
+            const response = await fetch(`${API_BASE}/api/queue/settings/toggle`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

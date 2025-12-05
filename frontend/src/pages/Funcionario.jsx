@@ -223,7 +223,7 @@ const Funcionario = () => {
     const fetchOrders = useCallback(async () => {
         if (!token) return;
         try {
-            const response = await fetch(`${API_BASE}/orders/active`, {
+            const response = await fetch(`${API_BASE}/api/orders/active`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
@@ -249,7 +249,7 @@ const Funcionario = () => {
         }
         try {
             const response = await fetch(
-                `${API_BASE}/orders/${orderId}/status`,
+                `${API_BASE}/api/orders/${orderId}/status`,
                 {
                     method: 'PUT',
                     headers: {
@@ -284,7 +284,7 @@ const Funcionario = () => {
             return;
         }
         try {
-            const response = await fetch(`${API_BASE}/orders/${orderId}`, {
+            const response = await fetch(`${API_BASE}/api/orders/${orderId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

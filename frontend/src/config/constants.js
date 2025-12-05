@@ -11,12 +11,21 @@ const isDevelopment = import.meta.env?.DEV ?? false;
 // ============================================================
 // API
 // ============================================================
+/**
+ * Retorna a URL base do servidor (SEM /api no final).
+ * VITE_API_URL deve ser configurada como:
+ *   - Produção: https://encantosdoforno-production.up.railway.app
+ *   - Dev: http://localhost:3000
+ */
 const getApiBaseUrl = () => {
     const envUrl = import.meta.env?.VITE_API_URL;
-    if (envUrl) return envUrl;
+    if (envUrl) {
+        // Remove trailing slash e /api se existirem para normalizar
+        return envUrl.replace(/\/(api)?\/?$/, '');
+    }
 
     // Fallback apenas para desenvolvimento local
-    if (isDevelopment) return 'http://localhost:3000/api';
+    if (isDevelopment) return 'http://localhost:3000';
 
     // Em produção sem variável configurada, lança erro
     console.error('VITE_API_URL não configurada!');

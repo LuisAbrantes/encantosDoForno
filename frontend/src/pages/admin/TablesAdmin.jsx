@@ -510,7 +510,7 @@ const TablesAdmin = () => {
     const fetchTables = useCallback(async () => {
         try {
             const statusParam = filter !== 'all' ? `?status=${filter}` : '';
-            const response = await fetch(`${API_BASE}/tables${statusParam}`, {
+            const response = await fetch(`${API_BASE}/api/tables${statusParam}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
@@ -527,7 +527,7 @@ const TablesAdmin = () => {
 
     const fetchStats = useCallback(async () => {
         try {
-            const response = await fetch(`${API_BASE}/tables/stats`, {
+            const response = await fetch(`${API_BASE}/api/tables/stats`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
@@ -545,7 +545,7 @@ const TablesAdmin = () => {
     const fetchLocations = useCallback(async () => {
         try {
             const response = await fetch(
-                `${API_BASE}/table-locations?active=false`,
+                `${API_BASE}/api/table-locations?active=false`,
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -575,8 +575,8 @@ const TablesAdmin = () => {
     const handleSaveTable = async (formData, tableId) => {
         try {
             const url = tableId
-                ? `${API_BASE}/tables/${tableId}`
-                : `${API_BASE}/tables`;
+                ? `${API_BASE}/api/tables/${tableId}`
+                : `${API_BASE}/api/tables`;
             const method = tableId ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
@@ -608,7 +608,7 @@ const TablesAdmin = () => {
         if (!confirm('Tem certeza que deseja excluir esta mesa?')) return;
 
         try {
-            const response = await fetch(`${API_BASE}/tables/${id}`, {
+            const response = await fetch(`${API_BASE}/api/tables/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -630,7 +630,7 @@ const TablesAdmin = () => {
 
     const handleReleaseTable = async id => {
         try {
-            const response = await fetch(`${API_BASE}/tables/${id}/release`, {
+            const response = await fetch(`${API_BASE}/api/tables/${id}/release`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -651,7 +651,7 @@ const TablesAdmin = () => {
     const handleSetMaintenance = async id => {
         try {
             const response = await fetch(
-                `${API_BASE}/tables/${id}/maintenance`,
+                `${API_BASE}/api/tables/${id}/maintenance`,
                 {
                     method: 'PUT',
                     headers: {
@@ -673,7 +673,7 @@ const TablesAdmin = () => {
 
     const handleSetAvailable = async id => {
         try {
-            const response = await fetch(`${API_BASE}/tables/${id}/available`, {
+            const response = await fetch(`${API_BASE}/api/tables/${id}/available`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -698,8 +698,8 @@ const TablesAdmin = () => {
     const handleSaveLocation = async (data, id = null) => {
         try {
             const url = id
-                ? `${API_BASE}/table-locations/${id}`
-                : `${API_BASE}/table-locations`;
+                ? `${API_BASE}/api/table-locations/${id}`
+                : `${API_BASE}/api/table-locations`;
             const method = id ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
@@ -727,7 +727,7 @@ const TablesAdmin = () => {
             return;
 
         try {
-            const response = await fetch(`${API_BASE}/table-locations/${id}`, {
+            const response = await fetch(`${API_BASE}/api/table-locations/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

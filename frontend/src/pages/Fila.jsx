@@ -449,7 +449,7 @@ const Fila = () => {
      */
     const fetchQueueInfo = useCallback(async () => {
         try {
-            const response = await fetch(`${API_BASE}/queue/info`);
+            const response = await fetch(`${API_BASE}/api/queue/info`);
             const result = await response.json();
             if (result.success) {
                 setQueueInfo(result.data);
@@ -467,7 +467,7 @@ const Fila = () => {
         if (!entryId) return;
 
         try {
-            const response = await fetch(`${API_BASE}/queue/status/${entryId}`);
+            const response = await fetch(`${API_BASE}/api/queue/status/${entryId}`);
             const result = await response.json();
 
             if (result.success && result.data) {
@@ -519,7 +519,7 @@ const Fila = () => {
         try {
             // Usa o endpoint de info que já tem a contagem
             // A lista pública mostra apenas posições, não dados sensíveis
-            const response = await fetch(`${API_BASE}/queue/info`);
+            const response = await fetch(`${API_BASE}/api/queue/info`);
             const result = await response.json();
             if (result.success) {
                 // Simula lista básica com base na contagem
@@ -549,7 +549,7 @@ const Fila = () => {
         setError('');
 
         try {
-            const response = await fetch(`${API_BASE}/queue`, {
+            const response = await fetch(`${API_BASE}/api/queue`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -583,7 +583,7 @@ const Fila = () => {
         const entryId = localStorage.getItem('queueEntryId');
 
         try {
-            const response = await fetch(`${API_BASE}/queue/${entryId}`, {
+            const response = await fetch(`${API_BASE}/api/queue/${entryId}`, {
                 method: 'DELETE'
             });
 
@@ -620,7 +620,7 @@ const Fila = () => {
         if (!entryId) return;
 
         try {
-            const response = await fetch(`${API_BASE}/queue/${entryId}`, {
+            const response = await fetch(`${API_BASE}/api/queue/${entryId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ party_size: parseInt(newSize) })
